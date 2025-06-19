@@ -4,18 +4,14 @@
 [[plugins]]
   package = "@netlify/plugin-functions"
 
-[functions]
-  node_bundler = "esbuild"
-
-# Scheduled function - runs every day at 8 AM UTC
 [[plugins]]
   package = "netlify-plugin-cron"
-  
+
   [plugins.inputs]
     jobs = [
-      {
+      { 
         name = "daily-briefs",
-        cron = "0 8 * * *",
-        command = "curl -X POST https://dbg1.netlify.app/.netlify/functions/send-daily-briefs"
+        schedule = "0 8 * * *",
+        command = "curl -X POST https://your-site.netlify.app/.netlify/functions/send-daily-briefs"
       }
     ]
