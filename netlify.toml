@@ -15,3 +15,4 @@
         command = "curl -X POST https://dbg1.netlify.app/.netlify/functions/send-daily-briefs"
       }
     ]
+
