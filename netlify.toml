@@ -1,16 +1,10 @@
 [build]
-  functions = "netlify/functions"
+functions = "netlify/functions"
 
 [[plugins]]
-  package = "@netlify/plugin-functions"
+package = "@netlify/plugin-functions"
 
 [[plugins]]
-  package = "netlify-plugin-cron"
+package = "netlify-plugin-cron"
 [plugins.inputs]
-  jobs = [
-    {
-      name = "daily-briefs",
-      schedule = "0 8 * * *",
-      command = "curl -X POST https://dbg1.netlify.app/.netlify/functions/send-daily-briefs"
-    }
-  ]
+jobs = [{ name = "daily-briefs", schedule = "0 8 * * *", command = "curl -X POST https://dbg1.netlify.app/.netlify/functions/send-daily-briefs" }]
