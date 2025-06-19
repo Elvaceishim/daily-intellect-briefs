@@ -4,6 +4,8 @@ import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
 
 const handler: Handler = async (event: HandlerEvent) => {
+  console.log("Scheduled function running at:", new Date().toISOString());
+  
   // Verify this is a scheduled call (security measure)
   if (event.httpMethod !== 'POST') {
     return {
@@ -125,5 +127,8 @@ const handler: Handler = async (event: HandlerEvent) => {
     };
   }
 };
+
+// Set schedule
+exports.schedule = "0 8 * * *"; // Run at 8 AM daily
 
 export { handler };
