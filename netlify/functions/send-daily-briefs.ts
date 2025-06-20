@@ -2,7 +2,7 @@ import { Handler, HandlerEvent } from '@netlify/functions';
 import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
 import { NewsService } from '../../src/services/newsService';
-import { getSummariesForTopic } from './aiSummaryService';
+import { getSummariesForTopic } from '../../src/services/aiSummaryService';
 
 // import type { User } from '../../src/types/User'; // Adjust the import path as needed
 // import type { User } from '../../src/types/User'; // Adjust the import path as needed
