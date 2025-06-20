@@ -12,11 +12,14 @@ export class NewsService {
   private apiUrl: string;
 
   constructor() {
-    // Check both environment variable formats
-    this.apiKey = process.env.NEWS_API_KEY || process.env.VITE_NEWS_API_KEY || '';
-    this.apiUrl = 'https://newsapi.org/v2';
+    // Check for GNews API key with fallback options
+    this.apiKey = process.env.GNEWS_API_KEY || 
+                  process.env.VITE_GNEWS_API_KEY || 
+                  '';
     
-    console.log('News API key available:', Boolean(this.apiKey));
+    this.apiUrl = 'https://gnews.io/api/v4';
+    
+    console.log('GNews API key available:', Boolean(this.apiKey));
   }
 
   async fetchNews(categories: string[] = ['general'], limit: number = 10): Promise<NewsItem[]> {

@@ -18,19 +18,19 @@ export const handler: Handler = async (event) => {
 
   try {
     console.log('Environment check:', {
-      hasNewsApiKey: Boolean(process.env.NEWS_API_KEY),
-      hasViteNewsApiKey: Boolean(process.env.VITE_NEWS_API_KEY),
+      hasGnewsApiKey: Boolean(process.env.GNEWS_API_KEY),
+      hasViteGnewsApiKey: Boolean(process.env.VITE_GNEWS_API_KEY),
       hasResendApiKey: Boolean(process.env.RESEND_API_KEY),
       hasViteResendApiKey: Boolean(process.env.VITE_RESEND_API_KEY)
     });
     
-    // Check for required environment variables
-    if (!process.env.NEWS_API_KEY && !process.env.VITE_NEWS_API_KEY) {
+    // Update this check for GNews API
+    if (!process.env.GNEWS_API_KEY && !process.env.VITE_GNEWS_API_KEY) {
       return {
         statusCode: 400,
         body: JSON.stringify({ 
           success: false, 
-          message: 'Missing News API key configuration' 
+          message: 'Missing GNews API key configuration' 
         })
       };
     }
