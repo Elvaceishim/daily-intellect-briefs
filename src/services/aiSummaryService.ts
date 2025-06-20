@@ -29,9 +29,7 @@ export async function getSummariesForTopic(topicText: string) {
   };
 }
 
-// Example news article text
-const newsArticleText = "Your news article text goes here.";
 
-const summaries = await getSummariesForTopic(newsArticleText);
-// summaries.gist  → short summary
-// summaries.brainy → in-depth summary
+//const newsArticleText = "Your news article text goes here.";
+
+//const summaries = await getSummariesForTopic(newsArticleText);
