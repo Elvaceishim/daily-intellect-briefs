@@ -1,49 +1,73 @@
-import { Handler, HandlerEvent } from '@netlify/functions';
-import { EmailService } from '../../src/services/emailService';
+import EmailService from '../../src/services/emailService';
+import NewsService from '../../src/services/newsService';
+import type { Handler } from '@netlify/functions';
 
-const handler: Handler = async (event: HandlerEvent) => {
+interface TestEmailRequest {
+  email?: string;
+}
+
+export const handler: Handler = async (event) => {
+  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
+      body: JSON.stringify({ message: 'Method Not Allowed' })
     };
   }
 
   try {
-    const { email } = JSON.parse(event.body || '{}');
+    // Parse the request body
+    const body = JSON.parse(event.body || '{}') as TestEmailRequest;
+    const email = body.email || 'your-email@example.com'; // Default or user-provided email
     
-    if (!email) {
+    console.log(`Sending test email to ${email}`);
+    
+    // Create services
+    const newsService = new NewsService();
+    const emailService = new EmailService();
+    
+    // Fetch sample news
+    const topics = ['technology', 'business'];
+    const newsItems = await newsService.fetchNews(topics, 4);
+    
+    if (newsItems.length === 0) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Email address is required' })
+        body: JSON.stringify({ 
+          success: false, 
+          message: 'Could not fetch news items for the test email' 
+        })
       };
     }
-
-    const emailService = new EmailService();
-    const success = await emailService.sendTestEmail(email);
-
+    
+    // Send test email
+    const result = await emailService.sendDailyDigest(
+      email, 
+      'Test User', 
+      newsItems,
+      topics
+    );
+    
     return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      statusCode: result.success ? 200 : 500,
       body: JSON.stringify({
-        success,
-        message: success ? 'Test email sent successfully' : 'Failed to send test email'
+        success: result.success,
+        message: result.success ? 
+          `Test email sent successfully to ${email}` : 
+          `Failed to send test email to ${email}`,
+        data: result
       })
     };
-
   } catch (error) {
     console.error('Error sending test email:', error);
     
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         success: false,
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: 'Error sending test email',
+        error: error instanceof Error ? error.message : String(error)
       })
     };
   }
 };
-
-export { handler };

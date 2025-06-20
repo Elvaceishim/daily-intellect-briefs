@@ -1,56 +1,35 @@
-interface User {
-  email: string;
-  name?: string;
-  preferences: {
-    selectedTopics: string[];
-    preferredTime: string;
-    emailEnabled: boolean;
-  };
-  createdAt: string;
-  lastEmailSent?: string;
+export interface UserPreferences {
+  selectedTopics: string[];
+  emailEnabled: boolean;
 }
 
-export class UserService {
-  // In production, this would connect to your database
-  // For now, we'll use a simple JSON store approach
-  
-  async getAllUsers(): Promise<User[]> {
-    // This is a placeholder - in production you'd query your database
-    // For testing, you can return some mock users
-    return [
-      {
-        email: "test@example.com",
-        name: "Test User",
-        preferences: {
-          selectedTopics: ["technology", "business"],
-          preferredTime: "08:00",
-          emailEnabled: true
-        },
-        createdAt: new Date().toISOString()
+export interface User {
+  email: string;
+  name: string;
+  preferences: UserPreferences;
+}
+
+class UserService {
+  // Mock user data - in production, you would fetch from a database
+  private users: User[] = [
+    {
+      email: 'your-email@example.com', // Replace with your email for testing
+      name: 'Test User',
+      preferences: {
+        selectedTopics: ['technology', 'business', 'science'],
+        emailEnabled: true
       }
-    ];
+    }
+  ];
+
+  async getActiveUsers(): Promise<User[]> {
+    // In a real app, fetch from database/API
+    return this.users.filter(user => user.preferences.emailEnabled);
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
-    const users = await this.getAllUsers();
-    return users.find(user => user.email === email) || null;
-  }
-
-  async updateUserPreferences(email: string, preferences: Partial<User['preferences']>): Promise<boolean> {
-    // In production, update the database
-    console.log(`Updating preferences for ${email}:`, preferences);
-    return true;
-  }
-
-  async addUser(user: Omit<User, 'createdAt'>): Promise<boolean> {
-    // In production, add to database
-    console.log(`Adding new user:`, user);
-    return true;
-  }
-
-  async updateLastEmailSent(email: string): Promise<boolean> {
-    // In production, update the database
-    console.log(`Updated last email sent for ${email}:`, new Date().toISOString());
-    return true;
+    return this.users.find(user => user.email === email) || null;
   }
 }
+
+export default UserService;

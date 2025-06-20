@@ -7,30 +7,49 @@ interface NewsItem {
   publishedAt: string;
 }
 
+interface NewsAPIArticle {
+  title?: string;
+  description?: string;
+  content?: string;
+  url?: string;
+  source?: {
+    name?: string;
+  };
+  publishedAt?: string;
+}
+
 export class NewsService {
   private readonly NEWS_API_KEY = process.env.NEWS_API_KEY;
   private readonly OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  private apiUrl: string;
 
-  async fetchNews(categories: string[], limit: number = 10): Promise<NewsItem[]> {
+  constructor() {
+    this.apiUrl = 'https://newsapi.org/v2';
+  }
+
+  async fetchNews(categories: string[] = ['general'], limit: number = 10): Promise<NewsItem[]> {
     const allNews: NewsItem[] = [];
 
     for (const category of categories) {
       try {
         const response = await fetch(
-          `https://newsapi.org/v2/top-headlines?category=${category}&country=us&pageSize=${Math.ceil(limit / categories.length)}&apiKey=${this.NEWS_API_KEY}`
+          `${this.apiUrl}/top-headlines?category=${category}&country=us&pageSize=${Math.ceil(limit / categories.length)}&apiKey=${this.NEWS_API_KEY}`
         );
         
-        if (!response.ok) continue;
+        if (!response.ok) {
+          console.error(`Error fetching ${category} news:`, response.statusText);
+          continue;
+        }
         
         const data = await response.json();
         
-        const categoryNews = data.articles?.map((article: any) => ({
-          title: article.title,
-          summary: article.description || article.content?.substring(0, 200) + '...',
-          url: article.url,
-          source: article.source.name,
-          category: category,
-          publishedAt: article.publishedAt
+        const categoryNews: NewsItem[] = data.articles?.map((article: NewsAPIArticle) => ({
+          title: article.title?.replace(/\s\|\s.*$/, '') || 'Untitled Article',
+          summary: article.description || article.content?.substring(0, 160) + '...' || 'No summary available',
+          url: article.url || '',
+          source: article.source?.name || 'Unknown Source',
+          category,
+          publishedAt: article.publishedAt || new Date().toISOString()
         })) || [];
 
         allNews.push(...categoryNews);
@@ -39,10 +58,19 @@ export class NewsService {
       }
     }
 
-    // Sort by published date and limit
-    return allNews
-      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-      .slice(0, limit);
+    // Filter out articles without titles or URLs
+    const validNews = allNews.filter(article => 
+      article.title && article.title !== 'Untitled Article' && 
+      article.url && article.url.startsWith('http')
+    );
+    
+    // Sort by published date (newest first)
+    const sortedNews = validNews.sort((a, b) => 
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+    
+    // Return limited number of items
+    return sortedNews.slice(0, limit);
   }
 
   async generateAISummary(articles: NewsItem[]): Promise<NewsItem[]> {
