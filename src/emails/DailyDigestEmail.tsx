@@ -48,7 +48,7 @@ export const DailyDigestEmail: React.FC<DailyDigestEmailProps> = ({
           <Section style={header}>
             <Heading style={heading}>📰 Daily Intellect Brief</Heading>
             <Text style={subheading}>{briefDate} • Curated for {userName}</Text>
-            <Text style={categories}>
+            <Text style={categoriesStyle}>
               {newsItems.length} stories from: {categories.join(' • ')}
             </Text>
           </Section>
@@ -136,7 +136,7 @@ const subheading: React.CSSProperties = {
   margin: '0 0 5px',
 };
 
-const categories: React.CSSProperties = {
+const categoriesStyle: React.CSSProperties = {
   fontSize: '14px',
   color: '#888',
   margin: '8px 0 0',

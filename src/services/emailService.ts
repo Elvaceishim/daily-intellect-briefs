@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
 import DailyDigestEmail from '../emails/DailyDigestEmail';
+import { User } from './userService';
 
 export interface NewsItem {
   title: string;
@@ -19,6 +20,9 @@ export interface EmailResult {
 
 // Change from default export to named export
 export class EmailService {
+  sendDailyBrief(user: User, newsItems: NewsItem[]) {
+    throw new Error('Method not implemented.');
+  }
   private resend: Resend;
   private fromEmail: string;
 
@@ -59,7 +63,7 @@ export class EmailService {
       });
 
       console.log(`Email sent to ${recipientEmail}:`, result);
-      return { success: true, id: result.id };
+      return { success: true, id: result.data?.id };
     } catch (error) {
       console.error(`Failed to send email to ${recipientEmail}:`, error);
       return { success: false, error };

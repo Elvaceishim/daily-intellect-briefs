@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -6,13 +5,16 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Mail, Clock, Settings } from "lucide-react";
 import { useState } from "react";
+// import EmailPreferences from '@/components/EmailPreferences';
 
 interface DeliverySettingsProps {
   deliveryTime: string;
   onTimeChange: (time: string) => void;
+  currentUser: any; // Add appropriate type for user
+  handleSaveUserPreferences: () => void; // Adjust the type as necessary
 }
 
-export const DeliverySettings = ({ deliveryTime, onTimeChange }: DeliverySettingsProps) => {
+export const DeliverySettings = ({ deliveryTime, onTimeChange, currentUser, handleSaveUserPreferences }: DeliverySettingsProps) => {
   const [emailEnabled, setEmailEnabled] = useState(true);
   const [whatsappEnabled, setWhatsappEnabled] = useState(false);
 
@@ -105,6 +107,12 @@ export const DeliverySettings = ({ deliveryTime, onTimeChange }: DeliverySetting
             </Badge>
           </div>
         </div>
+
+        {/* Email Preferences Component */}
+        {/* <EmailPreferences 
+          user={currentUser} 
+          onSave={handleSaveUserPreferences} 
+        /> */}
       </CardContent>
     </Card>
   );

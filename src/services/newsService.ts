@@ -8,6 +8,9 @@ interface NewsItem {
 }
 
 export class NewsService {
+  generateAISummary(newsItems: NewsItem[]): NewsItem[] | PromiseLike<NewsItem[]> {
+    throw new Error('Method not implemented.');
+  }
   private apiKey: string;
   private apiUrl: string;
 

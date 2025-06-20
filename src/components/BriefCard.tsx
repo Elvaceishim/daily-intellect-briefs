@@ -1,8 +1,10 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, ExternalLink, TrendingUp } from "lucide-react";
+import { Button as MuiButton, Box } from '@mui/material';
+import { generateTLDR } from '../utils/tldr';
+import { createShareableBrief } from '../services/shareService';
 
 interface Brief {
   id: number;
@@ -11,6 +13,9 @@ interface Brief {
   summary: string;
   readTime: string;
   headlines: number;
+  newsItems: string[]; // Add this line to include newsItems
+  title: string;
+  content: string;
 }
 
 interface BriefCardProps {
@@ -47,6 +52,18 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
       day: 'numeric' 
     });
   };
+
+  const tldr = generateTLDR(
+    brief.newsItems.map(item => ({
+      title: item,
+      summary: "",
+      url: "",
+      source: "",
+      category: "",
+      publishedAt: ""
+    }))
+  );
+  const shareableLink = createShareableBrief({ ...brief, id: String(brief.id) });
 
   return (
     <Card className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500">
@@ -102,6 +119,23 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
           </div>
         </div>
       </CardContent>
+      <Box>
+        <MuiButton
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tldr)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ mr: 2 }}
+        >
+          Tweet this TL;DR
+        </MuiButton>
+        <MuiButton
+          href={shareableLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Share Brief
+        </MuiButton>
+      </Box>
     </Card>
   );
 };

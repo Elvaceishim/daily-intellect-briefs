@@ -1,74 +1,88 @@
-import EmailService from '../../src/services/emailService';
+// netlify/functions/daily-digest-scheduler.ts
+import { UserService } from '../../src/services/userService';
 import { NewsService } from '../../src/services/newsService';
-import UserService from '../../src/services/userService';
-import type { Handler } from '@netlify/functions';
+import { EmailService } from '../../src/services/emailService';
 
-// The main function handler
-export const handler: Handler = async (event) => {
-  console.log('Daily digest scheduled function running:', new Date().toISOString());
-  
+export const handler = async () => {
   try {
     const userService = new UserService();
     const newsService = new NewsService();
     const emailService = new EmailService();
+    
+    // Get all users who have enabled email delivery
+    const activeUsers = await userService.getAllActiveSubscribers();
+    console.log(`Found ${activeUsers.length} active subscribers`);
+    
     const results = [];
     
-    // Get all active users
-    const activeUsers = await userService.getActiveUsers();
-    
-    // Process for each active user
+    // Process each user
     for (const user of activeUsers) {
       console.log(`Processing digest for ${user.email}`);
       
-      // Fetch news for user's selected topics
-      const topics = user.preferences.selectedTopics || ['general'];
-      let newsItems = await newsService.fetchNews(topics, 8);
-      
-      if (newsItems.length === 0) {
-        console.warn(`No news found for ${user.email}`);
-        results.push({
-          email: user.email,
-          success: false,
-          error: 'No news items found'
+      try {
+        const formats = user.preferences.deliveryFormats || ['web'];
+        // Get personalized news based on user preferences
+        const newsItems = await newsService.fetchNews(
+          user.preferences.selectedTopics, 
+          8 // Number of articles per digest
+        );
+        
+        if (newsItems.length === 0) {
+          console.warn(`No news found for ${user.email}`);
+          results.push({ email: user.email, success: false, error: 'No news items found' });
+          continue;
+        }
+        
+        // Send personalized email
+        if (formats.includes('email')) {
+          const result = await emailService.sendDailyDigest(
+            user.email,
+            user.name,
+            newsItems,
+            user.preferences.selectedTopics
+          );
+          
+          results.push({
+            email: user.email,
+            success: result.success,
+            messageId: result.id
+          });
+        }
+        if (formats.includes('web')) {
+          // Save/update user's dashboard data in DB
+        }
+        if (formats.includes('shareable')) {
+          // Generate a unique shareable link and email or display it
+        }
+        if (formats.includes('tweet')) {
+          // Generate a tweetable TL;DR and offer a "Tweet this" button/link
+        }
+      } catch (error) {
+        console.error(`Error processing digest for ${user.email}:`, error);
+        results.push({ 
+          email: user.email, 
+          success: false, 
+          error: error instanceof Error ? error.message : 'Unknown error' 
         });
-        continue;
       }
-      
-      // Send email
-      const emailResult = await emailService.sendDailyDigest(
-        user.email,
-        user.name || 'Subscriber',
-        newsItems,
-        topics
-      );
-      
-      results.push({
-        email: user.email,
-        success: emailResult.success,
-        messageId: emailResult.id
-      });
     }
     
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: 'Daily digest processing completed',
-        timestamp: new Date().toISOString(),
+        processed: results.length,
+        successful: results.filter(r => r.success).length,
         results
       })
     };
   } catch (error) {
-    console.error('Error processing daily digests:', error);
-    
+    console.error('Error in daily digest scheduler:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: 'Failed to process daily digests',
-        message: error instanceof Error ? error.message : String(error)
-      })
+      body: JSON.stringify({ error: 'Failed to process daily digests' })
     };
   }
 };
 
-// This sets up the schedule (8am daily)
-export const schedule = '0 8 * * *';
+// Run at 8 AM daily
+export const schedule = "0 8 * * *";

@@ -1,7 +1,7 @@
 // netlify/functions/test-email-only.ts
 import { Resend } from 'resend';
 
-export const handler = async (event) => {
+export const handler = async (_event: unknown) => {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY || process.env.VITE_RESEND_API_KEY);
     const email = "anselmelvis62@gmail.com";

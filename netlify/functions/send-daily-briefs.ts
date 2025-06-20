@@ -3,6 +3,12 @@ import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
 import { NewsService } from '../../src/services/newsService';
 
+// import type { User } from '../../src/types/User'; // Adjust the import path as needed
+// import type { User } from '../../src/types/User'; // Adjust the import path as needed
+// import type * as UserTypes from '../../src/types/User'; // Adjust the import path as needed
+// import type { User } from '../../src/types/User'; // Adjust the import path as needed
+import type User from '../../src/types/User'; // Adjust the import path as needed
+
 const handler: Handler = async (event: HandlerEvent) => {
   console.log("Scheduled function running at:", new Date().toISOString());
   
@@ -23,7 +29,7 @@ const handler: Handler = async (event: HandlerEvent) => {
 
     // Get all users who should receive emails
     const users = await userService.getAllUsers();
-    const activeUsers = users.filter(user => user.preferences.emailEnabled);
+    const activeUsers = users.filter((user: User) => user.preferences.emailEnabled);
 
     console.log(`📧 Found ${activeUsers.length} active users`);
 
@@ -35,9 +41,9 @@ const handler: Handler = async (event: HandlerEvent) => {
     }
 
     // Group users by their preferred topics to optimize API calls
-    const topicGroups = new Map<string, typeof activeUsers>();
-    
-    activeUsers.forEach(user => {
+    const topicGroups = new Map<string, User[]>();
+        
+    activeUsers.forEach((user: User) => {
       const topicsKey = user.preferences.selectedTopics.sort().join(',');
       if (!topicGroups.has(topicsKey)) {
         topicGroups.set(topicsKey, []);
@@ -70,16 +76,10 @@ const handler: Handler = async (event: HandlerEvent) => {
         // Send emails to all users in this group
         for (const user of groupUsers) {
           try {
-            const success = await emailService.sendDailyBrief(user, newsItems);
-            
-            if (success) {
-              await userService.updateLastEmailSent(user.email);
-              totalEmailsSent++;
-              console.log(`✅ Email sent to ${user.email}`);
-            } else {
-              totalErrors++;
-              console.error(`❌ Failed to send email to ${user.email}`);
-            }
+            await emailService.sendDailyBrief(user, newsItems);
+            await userService.updateLastEmailSent(user.email);
+            totalEmailsSent++;
+            console.log(`✅ Email sent to ${user.email}`);
 
             // Small delay to avoid rate limits
             await new Promise(resolve => setTimeout(resolve, 100));
