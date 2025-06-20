@@ -2,8 +2,8 @@
 import { Helmet } from 'react-helmet';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getBriefByToken } from '../services/briefService';
 import SocialShareButtons from '../components/SocialShareButtons';
+import { getBriefByToken } from '../services/briefService';
 
 export default function ShareBrief() {
   const { token } = useParams();
