@@ -127,10 +127,8 @@ export const schedule = "0 8 * * *"; // Run at 8 AM daily
 
 export { handler };
 
-interface NewsItem {
-  content: string;
-  [key: string]: any;
-}
+// Remove local NewsItem interface and import the correct one from your types
+import type { NewsItem } from '../../src/types/NewsItem';
 
 interface Summary {
   summary: string;
