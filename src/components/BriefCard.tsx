@@ -2,9 +2,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, ExternalLink, TrendingUp } from "lucide-react";
-import { Button as MuiButton, Box } from '@mui/material';
+import { Button as MuiButton, Box, Stack } from '@mui/material';
 import { generateTLDR } from '../utils/tldr';
 import { createShareableBrief } from '../services/shareService';
+import SocialShareButtons from './SocialShareButtons';
 
 interface Brief {
   id: number;
@@ -136,6 +137,11 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
           Share Brief
         </MuiButton>
       </Box>
+      <SocialShareButtons
+        shareUrl={shareableLink}
+        title={brief.title}
+        summary={brief.summary}
+      />
     </Card>
   );
 };
