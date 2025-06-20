@@ -48,7 +48,7 @@ const SettingsModal = ({ open, onClose }: SettingsModalProps) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: 'your-email@example.com' 
+          email: 'anselmelvis62@gmail.com' // Change to your email
         })
       });
       
