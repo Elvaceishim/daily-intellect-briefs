@@ -7,33 +7,35 @@ interface NewsItem {
   publishedAt: string;
 }
 
-interface NewsAPIArticle {
-  title?: string;
-  description?: string;
-  content?: string;
-  url?: string;
-  source?: {
-    name?: string;
-  };
-  publishedAt?: string;
-}
-
 export class NewsService {
-  private readonly NEWS_API_KEY = process.env.NEWS_API_KEY;
-  private readonly OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  private apiKey: string;
   private apiUrl: string;
 
   constructor() {
-    this.apiUrl = 'https://newsapi.org/v2';
+    this.apiKey = process.env.VITE_GNEWS_API_KEY || '';
+    this.apiUrl = 'https://gnews.io/api/v4';
   }
 
-  async fetchNews(categories: string[] = ['general', 'technology'], limit: number = 10): Promise<NewsItem[]> {
-    const allNews: NewsItem[] = [];
-
-    for (const category of categories) {
-      try {
+  async fetchNews(categories: string[] = ['general'], limit: number = 10): Promise<NewsItem[]> {
+    try {
+      const allNews: NewsItem[] = [];
+      
+      // Map our categories to GNews categories
+      const categoryMapping: Record<string, string> = {
+        'technology': 'technology',
+        'business': 'business',
+        'entertainment': 'entertainment',
+        'general': 'general',
+        'health': 'health',
+        'science': 'science',
+        'sports': 'sports'
+      };
+      
+      // Fetch news for each requested category
+      for (const category of categories) {
+        const gnewsCategory = categoryMapping[category] || 'general';
         const response = await fetch(
-          `${this.apiUrl}/top-headlines?category=${category}&country=us&pageSize=${Math.ceil(limit / categories.length)}&apiKey=${this.NEWS_API_KEY}`
+          `${this.apiUrl}/top-headlines?category=${gnewsCategory}&lang=en&max=${Math.ceil(limit / categories.length)}&apikey=${this.apiKey}`
         );
         
         if (!response.ok) {
@@ -43,9 +45,10 @@ export class NewsService {
         
         const data = await response.json();
         
-        const categoryNews: NewsItem[] = data.articles?.map((article: NewsAPIArticle) => ({
-          title: article.title?.replace(/\s\|\s.*$/, '') || 'Untitled Article',
-          summary: article.description || article.content?.substring(0, 160) + '...' || 'No summary available',
+        // GNews format is different - adapt it to our format
+        const categoryNews: NewsItem[] = data.articles?.map((article: any) => ({
+          title: article.title || 'Untitled Article',
+          summary: article.description || 'No summary available',
           url: article.url || '',
           source: article.source?.name || 'Unknown Source',
           category,
@@ -53,72 +56,22 @@ export class NewsService {
         })) || [];
 
         allNews.push(...categoryNews);
-      } catch (error) {
-        console.error(`Error fetching ${category} news:`, error);
       }
-    }
 
-    // Filter out articles without titles or URLs
-    const validNews = allNews.filter(article => 
-      article.title && article.title !== 'Untitled Article' && 
-      article.url && article.url.startsWith('http')
-    );
-    
-    // Sort by published date (newest first)
-    const sortedNews = validNews.sort((a, b) => 
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-    );
-    
-    // Return limited number of items
-    return sortedNews.slice(0, limit);
-  }
-
-  async generateAISummary(articles: NewsItem[]): Promise<NewsItem[]> {
-    if (!this.OPENAI_API_KEY) {
-      console.warn('OpenAI API key not found, using original summaries');
-      return articles;
-    }
-
-    try {
-      const summariesPromises = articles.map(async (article) => {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${this.OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
-            messages: [
-              {
-                role: 'system',
-                content: 'You are a news summarizer. Create concise, informative 2-sentence summaries of news articles.'
-              },
-              {
-                role: 'user',
-                content: `Summarize this news article in 2 sentences:\n\nTitle: ${article.title}\nContent: ${article.summary}`
-              }
-            ],
-            max_tokens: 100,
-            temperature: 0.3,
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          return {
-            ...article,
-            summary: data.choices[0]?.message?.content || article.summary
-          };
-        }
-        
-        return article;
-      });
-
-      return await Promise.all(summariesPromises);
+      // Filter, sort and limit as before
+      const validNews = allNews.filter(article => 
+        article.title && article.title !== 'Untitled Article' && 
+        article.url && article.url.startsWith('http')
+      );
+      
+      const sortedNews = validNews.sort((a, b) => 
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      );
+      
+      return sortedNews.slice(0, limit);
     } catch (error) {
-      console.error('Error generating AI summaries:', error);
-      return articles;
+      console.error('Error fetching news:', error);
+      return [];
     }
   }
 }
