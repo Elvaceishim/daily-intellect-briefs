@@ -27,7 +27,7 @@ export class NewsService {
     this.apiUrl = 'https://newsapi.org/v2';
   }
 
-  async fetchNews(categories: string[] = ['general'], limit: number = 10): Promise<NewsItem[]> {
+  async fetchNews(categories: string[] = ['general', 'technology'], limit: number = 10): Promise<NewsItem[]> {
     const allNews: NewsItem[] = [];
 
     for (const category of categories) {
