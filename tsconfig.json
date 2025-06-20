@@ -11,9 +11,11 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "composite": true,
+    "noEmit": true,             // Keep this true - Vite handles transpilation
+    "declaration": false,       // Add this line to disable .d.ts generation
     "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
