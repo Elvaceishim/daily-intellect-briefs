@@ -37,52 +37,50 @@ const SettingsModal = ({ open, onClose }: SettingsModalProps) => {
   const sendTestEmail = async () => {
     setLoading(true);
     try {
-      // Check if running locally
-      const isLocal = window.location.hostname === 'localhost';
+      // Create a notification for the request
+      setNotification({
+        open: true,
+        message: 'Sending test email request...',
+        type: 'success'
+      });
       
-      // If local, use a mock response
-      if (isLocal) {
-        console.log("Running in dev mode - mocking function response");
-        
-        // Wait 1 second to simulate network request
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock success response
-        setNotification({
-          open: true,
-          message: 'DEV MODE: Email would be sent in production',
-          type: 'success'
-        });
-        
-        setLoading(false);
-        return;
-      }
-      
-      // Regular production code for Netlify environment
       const response = await fetch('/.netlify/functions/test-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'your-email@example.com' })
+        body: JSON.stringify({ 
+          email: 'your-email@example.com' 
+        })
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+      // Log the raw response
+      console.log('Raw response status:', response.status);
+      
+      // Get response text first (safer than direct json)
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      // Try to parse as JSON if possible
+      let result;
+      try {
+        result = JSON.parse(responseText);
+        console.log('Parsed result:', result);
+      } catch (e) {
+        console.error('Failed to parse response as JSON:', e);
       }
       
-      const result = await response.json();
-      
+      // Show the result or error
       setNotification({
         open: true,
-        message: result.success ? 
+        message: result?.success ? 
           'Test email sent! Check your inbox.' : 
-          `Failed to send test email: ${result.message}`,
-        type: result.success ? 'success' : 'error'
+          `Failed: ${result?.message || response.statusText}`,
+        type: result?.success ? 'success' : 'error'
       });
     } catch (error) {
-      console.error('Error sending test email:', error);
+      console.error('Network error:', error);
       setNotification({
         open: true,
-        message: `Error sending test email: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        message: `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
         type: 'error'
       });
     } finally {

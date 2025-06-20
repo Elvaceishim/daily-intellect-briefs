@@ -23,6 +23,27 @@ export const handler: Handler = async (event) => {
     
     console.log(`Sending test email to ${email}`);
     
+    // Validate environment variables
+    if (!process.env.VITE_RESEND_API_KEY) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ 
+          success: false, 
+          message: 'Missing Resend API key configuration' 
+        })
+      };
+    }
+    
+    if (!process.env.VITE_NEWS_API_KEY) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ 
+          success: false, 
+          message: 'Missing News API key configuration' 
+        })
+      };
+    }
+    
     // Create services
     const newsService = new NewsService();
     const emailService = new EmailService();
