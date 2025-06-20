@@ -64,7 +64,8 @@ export const handler: Handler = async (event) => {
     }
     
     // Send test email
-    const email = 'your-email@example.com'; // Default or user-provided email
+    const body = JSON.parse(event.body || '{}') as TestEmailRequest;
+    const email = body.email || 'anselmelvis62@gmail.com'; // Update this
     const result = await emailService.sendDailyDigest(
       email, 
       'Test User', 
