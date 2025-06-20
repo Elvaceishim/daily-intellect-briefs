@@ -2,12 +2,13 @@ import { Handler, HandlerEvent } from '@netlify/functions';
 import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
 import { NewsService } from '../../src/services/newsService';
+import { getSummariesForTopic } from './aiSummaryService';
 
 // import type { User } from '../../src/types/User'; // Adjust the import path as needed
 // import type { User } from '../../src/types/User'; // Adjust the import path as needed
 // import type * as UserTypes from '../../src/types/User'; // Adjust the import path as needed
 // import type { User } from '../../src/types/User'; // Adjust the import path as needed
-import type User from '../../src/types/User'; // Adjust the import path as needed
+import type { User } from '../../src/types/User'; // Adjust the import path as needed
 
 const handler: Handler = async (event: HandlerEvent) => {
   console.log("Scheduled function running at:", new Date().toISOString());
@@ -28,7 +29,7 @@ const handler: Handler = async (event: HandlerEvent) => {
     const userService = new UserService();
 
     // Get all users who should receive emails
-    const users = await userService.getAllUsers();
+    const users: User[] = await userService.getAllUsers();
     const activeUsers = users.filter((user: User) => user.preferences.emailEnabled);
 
     console.log(`📧 Found ${activeUsers.length} active users`);
@@ -57,40 +58,33 @@ const handler: Handler = async (event: HandlerEvent) => {
     // Process each topic group
     for (const [topicsKey, groupUsers] of topicGroups) {
       const topics = topicsKey.split(',');
-      console.log(`📰 Fetching news for topics: ${topics.join(', ')}`);
+      // Fetch news for this topic group
+      let newsItems = await newsService.fetchNews(topics, 8);
 
-      try {
-        // Fetch news for this topic group
-        let newsItems = await newsService.fetchNews(topics, 8);
-        
-        // Generate AI summaries if available
-        newsItems = await newsService.generateAISummary(newsItems);
+      // Attach AI summaries to each news item
+      newsItems = await generateAISummary(newsItems);
 
-        if (newsItems.length === 0) {
-          console.warn(`⚠️ No news found for topics: ${topics.join(', ')}`);
-          continue;
+      if (newsItems.length === 0) {
+        console.warn(`⚠️ No news found for topics: ${topics.join(', ')}`);
+        continue;
+      }
+
+      console.log(`✅ Found ${newsItems.length} news items for ${groupUsers.length} users`);
+
+      // Send emails to all users in this group
+      for (const user of groupUsers) {
+        try {
+          await emailService.sendDailyBrief(user, newsItems);
+          await userService.updateLastEmailSent(user.email);
+          totalEmailsSent++;
+          console.log(`✅ Email sent to ${user.email}`);
+
+          // Small delay to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (error) {
+          totalErrors++;
+          console.error(`❌ Error sending email to ${user.email}:`, error);
         }
-
-        console.log(`✅ Found ${newsItems.length} news items for ${groupUsers.length} users`);
-
-        // Send emails to all users in this group
-        for (const user of groupUsers) {
-          try {
-            await emailService.sendDailyBrief(user, newsItems);
-            await userService.updateLastEmailSent(user.email);
-            totalEmailsSent++;
-            console.log(`✅ Email sent to ${user.email}`);
-
-            // Small delay to avoid rate limits
-            await new Promise(resolve => setTimeout(resolve, 100));
-          } catch (error) {
-            totalErrors++;
-            console.error(`❌ Error sending email to ${user.email}:`, error);
-          }
-        }
-      } catch (error) {
-        console.error(`❌ Error processing topic group ${topicsKey}:`, error);
-        totalErrors += groupUsers.length;
       }
     }
 
@@ -132,3 +126,38 @@ const handler: Handler = async (event: HandlerEvent) => {
 export const schedule = "0 8 * * *"; // Run at 8 AM daily
 
 export { handler };
+
+interface NewsItem {
+  content: string;
+  [key: string]: any;
+}
+
+interface Summary {
+  summary: string;
+  [key: string]: any;
+}
+async function generateAISummary(newsItems: NewsItem[]): Promise<NewsItem[]> {
+  // For each news item, call getSummariesForTopic to get an AI summary.
+  // Assuming getSummariesForTopic takes an array of news items and returns an array of summaries.
+  // If getSummariesForTopic expects topics, you may need to adjust this logic.
+
+  // Collect the content of each news item to summarize
+  const contents = newsItems.map(item => item.content);
+
+  // Get summaries from the AI service
+  let summaries: Summary[];
+  try {
+    summaries = await getSummariesForTopic(contents);
+  } catch (error) {
+    console.error('Error generating AI summaries:', error);
+    // Fallback: return newsItems without summaries
+    return newsItems;
+  }
+
+  // Attach summaries to news items
+  return newsItems.map((item, idx) => ({
+    ...item,
+    aiSummary: summaries[idx]?.summary || ''
+  }));
+}
+

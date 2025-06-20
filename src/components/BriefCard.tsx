@@ -6,6 +6,17 @@ import { Button as MuiButton, Box, Stack } from '@mui/material';
 import { generateTLDR } from '../utils/tldr';
 import { createShareableBrief } from '../services/shareService';
 import SocialShareButtons from './SocialShareButtons';
+import { useState } from 'react';
+import SummaryModeToggle from './SummaryModeToggle';
+
+interface NewsItem {
+  title: string;
+  summaries: {
+    gist: string;
+    brainy: string;
+  };
+  // ...other fields
+}
 
 interface Brief {
   id: number;
@@ -14,9 +25,13 @@ interface Brief {
   summary: string;
   readTime: string;
   headlines: number;
-  newsItems: string[]; // Add this line to include newsItems
+  newsItems: NewsItem[]; // Change made here
   title: string;
   content: string;
+  summaries: {
+    gist: string;
+    brainy: string;
+  };
 }
 
 interface BriefCardProps {
@@ -56,7 +71,7 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
 
   const tldr = generateTLDR(
     brief.newsItems.map(item => ({
-      title: item,
+      title: item.title, // Change made here
       summary: "",
       url: "",
       source: "",
@@ -65,6 +80,8 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
     }))
   );
   const shareableLink = createShareableBrief({ ...brief, id: String(brief.id) });
+
+  const [mode, setMode] = useState<'gist' | 'brainy'>('gist');
 
   return (
     <Card className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500">
@@ -142,6 +159,16 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
         title={brief.title}
         summary={brief.summary}
       />
+      <div>
+        <h3>{brief.title}</h3>
+        <SummaryModeToggle mode={mode} setMode={setMode} />
+        <div>
+          {mode === 'gist' ? brief.summaries.gist : brief.summaries.brainy}
+        </div>
+      </div>
     </Card>
   );
 };
+
+// Example usage: Render BriefCard in a parent component by passing a 'brief' prop.
+// <BriefCard brief={someBriefObject} />
