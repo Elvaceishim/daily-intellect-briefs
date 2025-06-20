@@ -17,29 +17,30 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    // Parse the request body
-    const body = JSON.parse(event.body || '{}') as TestEmailRequest;
-    const email = body.email || 'your-email@example.com'; // Default or user-provided email
+    console.log('Environment check:', {
+      hasNewsApiKey: Boolean(process.env.NEWS_API_KEY),
+      hasViteNewsApiKey: Boolean(process.env.VITE_NEWS_API_KEY),
+      hasResendApiKey: Boolean(process.env.RESEND_API_KEY),
+      hasViteResendApiKey: Boolean(process.env.VITE_RESEND_API_KEY)
+    });
     
-    console.log(`Sending test email to ${email}`);
+    // Check for required environment variables
+    if (!process.env.NEWS_API_KEY && !process.env.VITE_NEWS_API_KEY) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ 
+          success: false, 
+          message: 'Missing News API key configuration' 
+        })
+      };
+    }
     
-    // Validate environment variables
     if (!process.env.VITE_RESEND_API_KEY) {
       return {
         statusCode: 400,
         body: JSON.stringify({ 
           success: false, 
           message: 'Missing Resend API key configuration' 
-        })
-      };
-    }
-    
-    if (!process.env.VITE_NEWS_API_KEY) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ 
-          success: false, 
-          message: 'Missing News API key configuration' 
         })
       };
     }
@@ -63,6 +64,7 @@ export const handler: Handler = async (event) => {
     }
     
     // Send test email
+    const email = 'your-email@example.com'; // Default or user-provided email
     const result = await emailService.sendDailyDigest(
       email, 
       'Test User', 
