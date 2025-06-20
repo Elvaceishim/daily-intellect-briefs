@@ -1,5 +1,6 @@
-import EmailService from '../../src/services/emailService';
-import NewsService from '../../src/services/newsService';
+// netlify/functions/test-email.ts
+import { EmailService } from '../../src/services/emailService';
+import { NewsService } from '../../src/services/newsService';
 import type { Handler } from '@netlify/functions';
 
 interface TestEmailRequest {

@@ -1,7 +1,7 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
-import { NewsService } from '../../src/services/newsService';
 import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
+import { NewsService } from '../../src/services/newsService';
 
 const handler: Handler = async (event: HandlerEvent) => {
   console.log("Scheduled function running at:", new Date().toISOString());
@@ -129,6 +129,6 @@ const handler: Handler = async (event: HandlerEvent) => {
 };
 
 // Set schedule
-exports.schedule = "0 8 * * *"; // Run at 8 AM daily
+export const schedule = "0 8 * * *"; // Run at 8 AM daily
 
 export { handler };

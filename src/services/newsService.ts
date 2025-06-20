@@ -122,3 +122,5 @@ export class NewsService {
     }
   }
 }
+
+export default NewsService;

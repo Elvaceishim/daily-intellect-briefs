@@ -9,7 +9,7 @@ export interface User {
   preferences: UserPreferences;
 }
 
-class UserService {
+export class UserService {
   // Mock user data - in production, you would fetch from a database
   private users: User[] = [
     {

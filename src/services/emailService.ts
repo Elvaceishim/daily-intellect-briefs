@@ -17,7 +17,8 @@ export interface EmailResult {
   error?: any;
 }
 
-class EmailService {
+// Change from default export to named export
+export class EmailService {
   private resend: Resend;
   private fromEmail: string;
 
@@ -66,4 +67,5 @@ class EmailService {
   }
 }
 
+// Add this default export as well for backward compatibility
 export default EmailService;
