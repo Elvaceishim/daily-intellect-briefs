@@ -124,16 +124,16 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span>{formatDate(brief?.date || '')}</span>
+              <span>{formatDate(brief.date)}</span>
               <span>•</span>
               <div className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                {brief?.readTime || 'Unknown'}
+                {brief.readTime}
               </div>
               <span>•</span>
               <div className="flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
-                {brief?.headlines || 0} headlines
+                {brief.headlines} headlines
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -191,16 +191,16 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
       </Box>
       <SocialShareButtons
         shareUrl={shareableLink}
-        title={brief?.title || ''}
-        summary={brief?.summary || ''}
+        title={brief.title || ''}
+        summary={brief.summary || ''}
       />
       <div className="brief-card">
         <h3>{brief.title || 'Untitled Brief'}</h3>
         <SummaryModeToggle mode={mode} setMode={setMode} />
         <div>
           {mode === 'gist'
-            ? (summaries?.gist || <em>No gist summary available.</em>)
-            : (summaries?.brainy || <em>No brainy summary available.</em>)
+            ? (summaries.gist || <em>No gist summary available.</em>)
+            : (summaries.brainy || <em>No brainy summary available.</em>)
           }
         </div>
         <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>
