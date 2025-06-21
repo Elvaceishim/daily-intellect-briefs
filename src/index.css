@@ -8,9 +8,7 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  line-height: 1.7;
-  letter-spacing: 0.01em;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 
 /* Modern gradient background */

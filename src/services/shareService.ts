@@ -10,8 +10,7 @@ export type Brief = {
 };
 // import type { Brief } from '../types/brief'; // Adjust the path as needed
 
-export function createShareableBrief(brief: Brief) {
-  const token = uuidv4();
-  // Save { token, brief } to your DB
-  return `${process.env.VITE_SITE_URL}/share/${token}`;
+export function createShareableBrief(brief: any) {
+  const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+  return `${siteUrl}/share/${brief.id}`;
 }

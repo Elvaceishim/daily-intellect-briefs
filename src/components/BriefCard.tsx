@@ -1,193 +1,143 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Clock, ExternalLink, TrendingUp } from "lucide-react";
-import { Button as MuiButton, Box, Stack } from '@mui/material';
-import { generateTLDR } from '../utils/tldr';
-import { createShareableBrief } from '../services/shareService';
-import SocialShareButtons from './SocialShareButtons';
-import { useState, ReactNode } from 'react';
-import SummaryModeToggle from './SummaryModeToggle';
+import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardActions,
+  Typography,
+  Button,
+  Stack,
+  IconButton,
+  Tooltip,
+  Box,
+  CircularProgress,
+} from '@mui/material';
+import TwitterIcon from '@mui/icons-material/X';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
-interface NewsItem {
-  title: string;
-  summaries?: {
-    gist?: string;
-    brainy?: string;
-  };
-  // ...other fields
-}
+// Import your AI summary service
+import { getSummariesForTopic } from '../services/aiSummaryService';
 
-interface Brief {
-  headlines: ReactNode;
-  id: number;
-  title: string;
-  date: string;
-  readTime: string;
-  summary: string;
-  summaries?: {
-    gist?: string;
-    brainy?: string;
-  };
-  newsItems: NewsItem[];
-  topics: string[];
-  // ...add other fields as needed
-}
-
-interface BriefCardProps {
-  brief: Brief;
-}
-
-const getTopicColor = (topic: string) => {
-  const colors = {
-    tech: 'bg-blue-100 text-blue-700',
-    ai: 'bg-purple-100 text-purple-700',
-    crypto: 'bg-orange-100 text-orange-700',
-    finance: 'bg-green-100 text-green-700'
-  };
-  return colors[topic as keyof typeof colors] || 'bg-gray-100 text-gray-700';
-};
-
-const getTopicIcon = (topic: string) => {
-  const icons = {
-    tech: '💻',
-    ai: '🤖',
-    crypto: '₿',
-    finance: '📈'
-  };
-  return icons[topic as keyof typeof icons] || '📰';
-};
-
-export const BriefCard = ({ brief }: BriefCardProps) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  // Null safety check for brief
-  if (!brief) {
-    return <div>No brief data available</div>;
-  }
-
-  const tldr = generateTLDR(
-    (brief.newsItems || []).map(item => ({
-      title: item.title || '',
-      summary: "",
-      url: "",
-      source: "",
-      category: "",
-      publishedAt: ""
-    }))
-  );
-
-  const shareableLink = createShareableBrief({ 
-    ...brief, 
-    id: String(brief.id), 
-    content: brief.summary || "" 
-  });
-
+export default function BriefCard({ brief }: { brief: any }) {
   const [mode, setMode] = useState<'gist' | 'brainy'>('gist');
-  
-  // Safe access to summaries with proper fallbacks
-  const summaries = {
-    gist: brief.summaries?.gist || '',
-    brainy: brief.summaries?.brainy || ''
+  const [summaries, setSummaries] = useState(brief.summaries ?? { gist: '', brainy: '' });
+  const [loading, setLoading] = useState(false);
+
+  // Fetch AI summaries if missing when toggling
+  const handleModeChange = async (newMode: 'gist' | 'brainy') => {
+    setMode(newMode);
+    if (!summaries.gist || !summaries.brainy) {
+      setLoading(true);
+      try {
+        const aiSummaries = await getSummariesForTopic(brief.content || brief.title);
+        setSummaries(aiSummaries);
+      } catch (e) {
+        // Optionally handle error
+      }
+      setLoading(false);
+    }
+  };
+
+  const appUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+  const briefUrl = `${appUrl}/share/${brief.id}`;
+
+  const handleShareX = () => {
+    const text = `${brief.title}\n${mode === 'gist' ? summaries.gist : summaries.brainy}\n${briefUrl}`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const handleShareLinkedIn = () => {
+    const url = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
+      briefUrl
+    )}&title=${encodeURIComponent(brief.title)}&summary=${encodeURIComponent(
+      mode === 'gist' ? summaries.gist : summaries.brainy
+    )}`;
+    window.open(url, '_blank');
   };
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span>{formatDate(brief.date)}</span>
-              <span>•</span>
-              <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {brief.readTime}
-              </div>
-              <span>•</span>
-              <div className="flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" />
-                {brief.headlines} headlines
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {(brief.topics || []).map((topic) => (
-                <Badge 
-                  key={topic} 
-                  variant="secondary" 
-                  className={getTopicColor(topic)}
-                >
-                  <span className="mr-1">{getTopicIcon(topic)}</span>
-                  {topic.charAt(0).toUpperCase() + topic.slice(1)}
-                </Badge>
-              ))}
-            </div>
-          </div>
-          <Button variant="ghost" size="sm">
-            <ExternalLink className="w-4 h-4" />
-          </Button>
-        </div>
-      </CardHeader>
+    <Card
+      elevation={4}
+      sx={{
+        borderRadius: 3,
+        background: 'rgba(255,255,255,0.97)',
+        boxShadow: '0 4px 24px 0 #a21caf22',
+        mb: 2,
+        overflow: 'visible',
+      }}
+    >
       <CardContent>
-        <CardDescription className="text-base leading-relaxed text-gray-700">
-          {brief.summary || 'No summary available'}
-        </CardDescription>
-        <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
-          <Button variant="outline" size="sm">
-            Read Full Brief
+        <Typography variant="h5" fontWeight={600} color="primary.dark" gutterBottom>
+          {brief.title}
+        </Typography>
+        <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 2 }}>
+          <Button
+            variant={mode === 'gist' ? 'contained' : 'outlined'}
+            color="secondary"
+            size="small"
+            onClick={() => handleModeChange('gist')}
+            sx={{ borderRadius: 2, textTransform: 'none' }}
+          >
+            ⚡ Just the Gist
           </Button>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm" className="text-gray-500">
-              Share
-            </Button>
-            <Button variant="ghost" size="sm" className="text-gray-500">
-              Save
-            </Button>
-          </div>
-        </div>
+          <Button
+            variant={mode === 'brainy' ? 'contained' : 'outlined'}
+            color="secondary"
+            size="small"
+            onClick={() => handleModeChange('brainy')}
+            sx={{ borderRadius: 2, textTransform: 'none' }}
+          >
+            🧠 More Brainy
+          </Button>
+        </Stack>
+        {loading ? (
+          <Stack alignItems="center" sx={{ my: 2 }}>
+            <CircularProgress size={24} />
+          </Stack>
+        ) : (
+          <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-line', minHeight: 60 }}>
+            {mode === 'gist'
+              ? summaries.gist || <em>No summary available.</em>
+              : summaries.brainy || <em>No summary available.</em>}
+          </Typography>
+        )}
+        <Box sx={{ fontSize: 13, color: '#a21caf', mt: 2 }}>
+          {brief.publishedAt
+            ? new Date(brief.publishedAt).toLocaleString()
+            : brief.date}
+        </Box>
       </CardContent>
-      <Box>
-        <MuiButton
-          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tldr)}`}
+      <CardActions sx={{ justifyContent: 'space-between', px: 2 }}>
+        <Button
+          variant="outlined"
+          color="primary"
+          size="small"
+          href={brief.url}
           target="_blank"
           rel="noopener noreferrer"
-          sx={{ mr: 2 }}
+          sx={{ borderRadius: 2, textTransform: 'none' }}
         >
-          Tweet this TL;DR
-        </MuiButton>
-        <MuiButton
-          href={shareableLink}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Share Brief
-        </MuiButton>
-      </Box>
-      <SocialShareButtons
-        shareUrl={shareableLink}
-        title={brief.title || ''}
-        summary={brief.summary || ''}
-      />
-      <div className="brief-card">
-        <h3>{brief.title || 'Untitled Brief'}</h3>
-        <SummaryModeToggle mode={mode} setMode={setMode} />
-        <div>
-          {mode === 'gist'
-            ? (summaries.gist || <em>No gist summary available.</em>)
-            : (summaries.brainy || <em>No brainy summary available.</em>)
-          }
-        </div>
-        <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>
-          {brief.date || 'No date available'}
-        </div>
-      </div>
+          Read Full Brief
+        </Button>
+        <Stack direction="row" spacing={1}>
+          <Tooltip title="Save">
+            <IconButton color="secondary">
+              <BookmarkBorderIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Share on X">
+            <IconButton color="primary" onClick={handleShareX}>
+              <TwitterIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Share on LinkedIn">
+            <IconButton color="primary" onClick={handleShareLinkedIn}>
+              <LinkedInIcon />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      </CardActions>
     </Card>
   );
-};
+}

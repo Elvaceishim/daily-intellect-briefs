@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
-export const theme = createTheme({
+const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
@@ -19,7 +19,7 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: "'Roboto', 'Segoe UI', 'Arial', sans-serif",
     h1: {
       fontSize: '3rem',
       fontWeight: 700,
@@ -69,3 +69,5 @@ export const theme = createTheme({
     },
   },
 });
+
+export default theme;
