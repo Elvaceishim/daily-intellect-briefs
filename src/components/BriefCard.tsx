@@ -6,7 +6,7 @@ import { Button as MuiButton, Box, Stack } from '@mui/material';
 import { generateTLDR } from '../utils/tldr';
 import { createShareableBrief } from '../services/shareService';
 import SocialShareButtons from './SocialShareButtons';
-import { useState } from 'react';
+import { useState, ReactNode } from 'react';
 import SummaryModeToggle from './SummaryModeToggle';
 
 interface NewsItem {
@@ -19,19 +19,19 @@ interface NewsItem {
 }
 
 interface Brief {
+  headlines: ReactNode;
   id: number;
-  date: string;
-  topics: string[];
-  summary: string;
-  readTime: string;
-  headlines: number;
-  newsItems: NewsItem[]; // Change made here
   title: string;
-  content: string;
+  date: string;
+  readTime: string;
+  summary: string;
   summaries: {
     gist: string;
     brainy: string;
   };
+  newsItems: NewsItem[];
+  topics: string[];
+  // ...add other fields as needed
 }
 
 interface BriefCardProps {
@@ -79,7 +79,11 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
       publishedAt: ""
     }))
   );
-  const shareableLink = createShareableBrief({ ...brief, id: String(brief.id) });
+  const shareableLink = createShareableBrief({ 
+    ...brief, 
+    id: String(brief.id), 
+    content: brief.summary || "" 
+  });
 
   const [mode, setMode] = useState<'gist' | 'brainy'>('gist');
 

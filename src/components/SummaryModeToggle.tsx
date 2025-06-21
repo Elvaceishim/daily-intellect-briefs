@@ -1,12 +1,13 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 
+type SummaryMode = 'gist' | 'brainy';
+
 type SummaryModeToggleProps = {
-  mode: 'gist' | 'brainy';
-  setMode: Dispatch<SetStateAction<'gist' | 'brainy'>>;
+  mode: SummaryMode;
+  setMode: Dispatch<SetStateAction<SummaryMode>>;
 };
 
 function SummaryModeToggle({ mode, setMode }: SummaryModeToggleProps) {
-  // Implement your toggle UI here
   return (
     <div>
       <button onClick={() => setMode('gist')} disabled={mode === 'gist'}>
@@ -20,7 +21,7 @@ function SummaryModeToggle({ mode, setMode }: SummaryModeToggleProps) {
 }
 
 export default function BriefCard({ summaries }) {
-  const [mode, setMode] = useState<'gist' | 'brainy'>('gist');
+  const [mode, setMode] = useState<SummaryMode>('gist');
   return (
     <div>
       <SummaryModeToggle mode={mode} setMode={setMode} />
