@@ -1,45 +1,63 @@
-import { useState, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
-type SummaryMode = 'gist' | 'brainy';
+type SummaryModeToggleProps = {
+  mode: 'gist' | 'brainy';
+  setMode: Dispatch<SetStateAction<'gist' | 'brainy'>>;
+};
 
-interface SummaryModeToggleProps {
-  mode: SummaryMode;
-  setMode: Dispatch<SetStateAction<SummaryMode>>;
-}
-
-function SummaryModeToggle({ mode, setMode }: SummaryModeToggleProps) {
-  // Implement your toggle UI here
+export function SummaryModeToggle({ mode, setMode }: SummaryModeToggleProps) {
   return (
     <div>
-      <button
-        onClick={() => setMode('gist')}
-        disabled={mode === 'gist'}
-      >
-        Gist
+      <button onClick={() => setMode('gist')} disabled={mode === 'gist'}>
+        ⚡ Just the Gist
       </button>
-      <button
-        onClick={() => setMode('brainy')}
-        disabled={mode === 'brainy'}
-      >
-        Brainy
+      <button onClick={() => setMode('brainy')} disabled={mode === 'brainy'}>
+        🧠 More Brainy
       </button>
     </div>
   );
 }
 
-export default function BriefCard({ summaries }) {
-  const [mode, setMode] = useState<SummaryMode>('gist');
-  
+// Define the type for summaries prop
+type Summaries = {
+  gist?: string;
+  brainy?: string;
+} | null | undefined;
+
+type BriefCardProps = {
+  summaries: Summaries;
+};
+
+export default function BriefCard({ summaries }: BriefCardProps) {
+  const [mode, setMode] = useState<'gist' | 'brainy'>('gist');
+
+  // Safe access to summaries with fallbacks
+  const safeSummaries = {
+    gist: summaries?.gist || '',
+    brainy: summaries?.brainy || ''
+  };
+
+  // Alternative approach: Early return if no summaries
+  if (!summaries) {
+    return (
+      <div>
+        <SummaryModeToggle mode={mode} setMode={setMode} />
+        <div>
+          <em>No summaries available</em>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <SummaryModeToggle mode={mode} setMode={setMode} />
       <div>
         {mode === 'gist' 
-          ? (summaries?.gist || 'No gist summary available')
-          : (summaries?.brainy || 'No brainy summary available')
+          ? (safeSummaries.gist || <em>No gist summary available</em>)
+          : (safeSummaries.brainy || <em>No brainy summary available</em>)
         }
       </div>
     </div>
   );
 }
-
