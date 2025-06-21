@@ -168,9 +168,9 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
         <h3>{brief.title}</h3>
         <SummaryModeToggle mode={mode} setMode={setMode} />
         <div>
-          {summaries.gist || summaries.brainy
-            ? (mode === 'gist' ? summaries.gist : summaries.brainy)
-            : <em>No summary available.</em>
+          {mode === 'gist'
+            ? summaries.gist || <em>No summary available.</em>
+            : summaries.brainy || <em>No summary available.</em>
           }
         </div>
         <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>{brief.date}</div>
