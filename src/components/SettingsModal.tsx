@@ -8,7 +8,13 @@ import {
   Typography,
   Button,
   Snackbar,
-  Alert
+  Alert,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+  TextField,
+  Stack,
+  Chip
 } from '@mui/material';
 import { X } from 'lucide-react';
 import TopicSelector from './TopicSelector';
@@ -16,9 +22,10 @@ import TopicSelector from './TopicSelector';
 interface SettingsModalProps {
   open: boolean;
   onClose: () => void;
+  user: any; // Add user prop type
 }
 
-const SettingsModal = ({ open, onClose }: SettingsModalProps) => {
+const SettingsModal = ({ open, onClose, user }: SettingsModalProps) => {
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<{
     open: boolean;
@@ -29,6 +36,9 @@ const SettingsModal = ({ open, onClose }: SettingsModalProps) => {
     message: '',
     type: 'success'
   });
+  const [notifications, setNotifications] = useState(true);
+  const [topics, setTopics] = useState(user.interests || []);
+  const [newTopic, setNewTopic] = useState('');
 
   const handleCloseNotification = () => {
     setNotification(prev => ({ ...prev, open: false }));
@@ -88,6 +98,17 @@ const SettingsModal = ({ open, onClose }: SettingsModalProps) => {
     }
   };
 
+  const handleAddTopic = () => {
+    if (newTopic && !topics.includes(newTopic)) {
+      setTopics([...topics, newTopic]);
+      setNewTopic('');
+    }
+  };
+
+  const handleRemoveTopic = (topic: string) => {
+    setTopics(topics.filter((t: string) => t !== topic));
+  };
+
   return (
     <>
       <Dialog
@@ -131,23 +152,63 @@ const SettingsModal = ({ open, onClose }: SettingsModalProps) => {
           <Box sx={{ p: 2 }}>
             <TopicSelector />
             
-            {/* Test Email Button */}
+            {/* Notification Settings */}
             <Box sx={{ mt: 4, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" sx={{ mb: 1 }}>
                 Email Delivery
               </Typography>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={notifications}
+                      onChange={() => setNotifications(!notifications)}
+                    />
+                  }
+                  label="Enable Email Notifications"
+                />
+              </FormGroup>
               <Button 
                 variant="contained"
                 color="primary"
                 onClick={sendTestEmail}
                 disabled={loading}
                 startIcon={<span>📧</span>}
+                sx={{ mt: 1 }}
               >
                 {loading ? 'Sending...' : 'Send Test Email'}
               </Button>
               <Typography variant="caption" display="block" sx={{ mt: 1, color: 'text.secondary' }}>
                 Sends a test digest to your email to verify the delivery system.
               </Typography>
+            </Box>
+            
+            {/* Topics/Interests Settings */}
+            <Box sx={{ mt: 4, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Your Topics/Interests
+              </Typography>
+              <Stack direction="row" spacing={1} sx={{ mb: 2 }} flexWrap="wrap">
+                {topics.map((topic: string) => (
+                  <Chip
+                    key={topic}
+                    label={topic}
+                    onDelete={() => handleRemoveTopic(topic)}
+                    sx={{ mb: 1 }}
+                  />
+                ))}
+              </Stack>
+              <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+                <TextField
+                  label="Add Topic"
+                  value={newTopic}
+                  onChange={e => setNewTopic(e.target.value)}
+                  size="small"
+                />
+                <Button variant="contained" onClick={handleAddTopic}>
+                  Add
+                </Button>
+              </Stack>
             </Box>
           </Box>
         </DialogContent>

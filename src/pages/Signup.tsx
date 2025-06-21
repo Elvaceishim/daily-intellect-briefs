@@ -10,7 +10,7 @@ export default function SignupPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem('signedUp', 'yes');
-    navigate('/all-briefs');
+    navigate('/dashboard');
   };
 
   return (
