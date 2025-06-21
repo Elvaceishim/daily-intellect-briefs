@@ -10,10 +10,16 @@ type SummaryModeToggleProps = {
 function SummaryModeToggle({ mode, setMode }: SummaryModeToggleProps) {
   return (
     <div>
-      <button onClick={() => setMode('gist')} disabled={mode === 'gist'}>
+      <button
+        onClick={() => setMode('gist')}
+        disabled={mode === 'gist'}
+      >
         Gist
       </button>
-      <button onClick={() => setMode('brainy')} disabled={mode === 'brainy'}>
+      <button
+        onClick={() => setMode('brainy')}
+        disabled={mode === 'brainy'}
+      >
         Brainy
       </button>
     </div>
@@ -25,9 +31,7 @@ export default function BriefCard({ summaries }) {
   return (
     <div>
       <SummaryModeToggle mode={mode} setMode={setMode} />
-      <div>
-        {mode === 'gist' ? summaries.gist : summaries.brainy}
-      </div>
+      <div>{mode === 'gist' ? summaries.gist : summaries.brainy}</div>
     </div>
   );
 }

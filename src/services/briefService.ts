@@ -27,3 +27,9 @@ export async function getBriefByToken(token: string | undefined) {
     // imageUrl: 'https://example.com/image.jpg', // Uncomment if needed
   };
 }
+
+export async function getUserBrief(userId: string) {
+  // Implement the function or re-export if already implemented elsewhere
+  // Example implementation:
+  // return fetch(`/api/brief/${userId}`).then(res => res.json());
+}

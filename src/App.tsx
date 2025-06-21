@@ -2,8 +2,8 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { theme } from './theme';
-import Index from './pages/Index';
-import ShareBrief from './pages/ShareBrief';
+import HomePage from './pages/Home';
+import AllBriefs from './pages/AllBriefs';
 
 const queryClient = new QueryClient();
 
@@ -15,8 +15,8 @@ function App() {
         <div className="min-h-screen">
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/share/:token" element={<ShareBrief />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/all-briefs" element={<AllBriefs />} />
             </Routes>
           </BrowserRouter>
         </div>
