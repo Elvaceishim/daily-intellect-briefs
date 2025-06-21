@@ -1,33 +1,25 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 
-type SummaryMode = 'gist' | 'brainy';
-
 type SummaryModeToggleProps = {
-  mode: SummaryMode;
-  setMode: Dispatch<SetStateAction<SummaryMode>>;
+  mode: 'gist' | 'brainy';
+  setMode: Dispatch<SetStateAction<'gist' | 'brainy'>>;
 };
 
-function SummaryModeToggle({ mode, setMode }: SummaryModeToggleProps) {
+export function SummaryModeToggle({ mode, setMode }: SummaryModeToggleProps) {
   return (
     <div>
-      <button
-        onClick={() => setMode('gist')}
-        disabled={mode === 'gist'}
-      >
-        Gist
+      <button onClick={() => setMode('gist')} disabled={mode === 'gist'}>
+        ⚡ Just the Gist
       </button>
-      <button
-        onClick={() => setMode('brainy')}
-        disabled={mode === 'brainy'}
-      >
-        Brainy
+      <button onClick={() => setMode('brainy')} disabled={mode === 'brainy'}>
+        🧠 More Brainy
       </button>
     </div>
   );
 }
 
 export default function BriefCard({ summaries }) {
-  const [mode, setMode] = useState<SummaryMode>('gist');
+  const [mode, setMode] = useState<'gist' | 'brainy'>('gist');
   return (
     <div>
       <SummaryModeToggle mode={mode} setMode={setMode} />
