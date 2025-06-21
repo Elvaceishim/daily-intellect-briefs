@@ -59,45 +59,64 @@ const getTopicIcon = (topic: string) => {
 };
 
 export const BriefCard = ({ brief }: BriefCardProps) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  // Null safety check for brief
+  // Early return with null safety check for brief
   if (!brief) {
     return <div>No brief data available</div>;
   }
 
-  const tldr = generateTLDR(
-    (brief.newsItems || []).map(item => ({
-      title: item.title || '',
-      summary: "",
-      url: "",
-      source: "",
-      category: "",
-      publishedAt: ""
-    }))
-  );
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'No date available';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
 
-  const shareableLink = createShareableBrief({ 
-    ...brief, 
-    id: String(brief.id), 
-    content: brief.summary || "" 
-  });
+  // Safe access to summaries with comprehensive fallbacks
+  const summaries = {
+    gist: brief?.summaries?.gist || '',
+    brainy: brief?.summaries?.brainy || ''
+  };
 
   const [mode, setMode] = useState<'gist' | 'brainy'>('gist');
-  
-  // Safe access to summaries with proper fallbacks
-  const summaries = {
-    gist: brief.summaries?.gist || '',
-    brainy: brief.summaries?.brainy || ''
-  };
+
+  // Safe TLDR generation
+  let tldr = '';
+  try {
+    tldr = generateTLDR(
+      (brief.newsItems || []).map(item => ({
+        title: item?.title || '',
+        summary: "",
+        url: "",
+        source: "",
+        category: "",
+        publishedAt: ""
+      }))
+    );
+  } catch (error) {
+    console.warn('Error generating TLDR:', error);
+    tldr = 'Brief summary unavailable';
+  }
+
+  // Safe shareable link creation
+  let shareableLink = '';
+  try {
+    shareableLink = createShareableBrief({ 
+      ...brief, 
+      id: String(brief.id || ''), 
+      content: brief.summary || "" 
+    });
+  } catch (error) {
+    console.warn('Error creating shareable link:', error);
+    shareableLink = '#';
+  }
 
   return (
     <Card className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500">
@@ -105,16 +124,16 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span>{formatDate(brief.date)}</span>
+              <span>{formatDate(brief?.date || '')}</span>
               <span>•</span>
               <div className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                {brief.readTime}
+                {brief?.readTime || 'Unknown'}
               </div>
               <span>•</span>
               <div className="flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
-                {brief.headlines} headlines
+                {brief?.headlines || 0} headlines
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -172,16 +191,16 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
       </Box>
       <SocialShareButtons
         shareUrl={shareableLink}
-        title={brief.title || ''}
-        summary={brief.summary || ''}
+        title={brief?.title || ''}
+        summary={brief?.summary || ''}
       />
       <div className="brief-card">
         <h3>{brief.title || 'Untitled Brief'}</h3>
         <SummaryModeToggle mode={mode} setMode={setMode} />
         <div>
           {mode === 'gist'
-            ? (summaries.gist || <em>No gist summary available.</em>)
-            : (summaries.brainy || <em>No brainy summary available.</em>)
+            ? (summaries?.gist || <em>No gist summary available.</em>)
+            : (summaries?.brainy || <em>No brainy summary available.</em>)
           }
         </div>
         <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>
@@ -191,3 +210,6 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
     </Card>
   );
 };
+
+// Example usage: Render BriefCard in a parent component by passing a 'brief' prop.
+// <BriefCard brief={someBriefObject} />
