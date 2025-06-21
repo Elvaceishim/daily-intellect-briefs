@@ -86,7 +86,7 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
   });
 
   const [mode, setMode] = useState<'gist' | 'brainy'>('gist');
-  const summaries = brief.summaries || { gist: '', brainy: '' };
+  const summaries = brief.summaries ?? { gist: '', brainy: '' };
 
   return (
     <Card className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500">
@@ -169,8 +169,8 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
         <SummaryModeToggle mode={mode} setMode={setMode} />
         <div>
           {mode === 'gist'
-            ? summaries.gist || <em>No summary available.</em>
-            : summaries.brainy || <em>No summary available.</em>
+            ? (summaries.gist || <em>No summary available.</em>)
+            : (summaries.brainy || <em>No summary available.</em>)
           }
         </div>
         <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>{brief.date}</div>
