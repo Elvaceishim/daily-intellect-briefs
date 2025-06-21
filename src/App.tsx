@@ -2,7 +2,6 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { theme } from './theme';
-import HomePage from './pages/Home';
 import AllBriefs from './pages/AllBriefs';
 
 const queryClient = new QueryClient();
