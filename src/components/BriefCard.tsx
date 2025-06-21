@@ -11,9 +11,9 @@ import SummaryModeToggle from './SummaryModeToggle';
 
 interface NewsItem {
   title: string;
-  summaries: {
-    gist: string;
-    brainy: string;
+  summaries?: {
+    gist?: string;
+    brainy?: string;
   };
   // ...other fields
 }
@@ -25,9 +25,9 @@ interface Brief {
   date: string;
   readTime: string;
   summary: string;
-  summaries: {
-    gist: string;
-    brainy: string;
+  summaries?: {
+    gist?: string;
+    brainy?: string;
   };
   newsItems: NewsItem[];
   topics: string[];
@@ -69,9 +69,14 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
     });
   };
 
+  // Null safety check for brief
+  if (!brief) {
+    return <div>No brief data available</div>;
+  }
+
   const tldr = generateTLDR(
-    brief.newsItems.map(item => ({
-      title: item.title, // Change made here
+    (brief.newsItems || []).map(item => ({
+      title: item.title || '',
       summary: "",
       url: "",
       source: "",
@@ -79,6 +84,7 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
       publishedAt: ""
     }))
   );
+
   const shareableLink = createShareableBrief({ 
     ...brief, 
     id: String(brief.id), 
@@ -86,7 +92,12 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
   });
 
   const [mode, setMode] = useState<'gist' | 'brainy'>('gist');
-  const summaries = brief.summaries ?? { gist: '', brainy: '' };
+  
+  // Safe access to summaries with proper fallbacks
+  const summaries = {
+    gist: brief.summaries?.gist || '',
+    brainy: brief.summaries?.brainy || ''
+  };
 
   return (
     <Card className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500">
@@ -107,7 +118,7 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {brief.topics.map((topic) => (
+              {(brief.topics || []).map((topic) => (
                 <Badge 
                   key={topic} 
                   variant="secondary" 
@@ -126,7 +137,7 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
       </CardHeader>
       <CardContent>
         <CardDescription className="text-base leading-relaxed text-gray-700">
-          {brief.summary}
+          {brief.summary || 'No summary available'}
         </CardDescription>
         <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
           <Button variant="outline" size="sm">
@@ -161,23 +172,22 @@ export const BriefCard = ({ brief }: BriefCardProps) => {
       </Box>
       <SocialShareButtons
         shareUrl={shareableLink}
-        title={brief.title}
-        summary={brief.summary}
+        title={brief.title || ''}
+        summary={brief.summary || ''}
       />
-      <div>
-        <h3>{brief.title}</h3>
+      <div className="brief-card">
+        <h3>{brief.title || 'Untitled Brief'}</h3>
         <SummaryModeToggle mode={mode} setMode={setMode} />
         <div>
           {mode === 'gist'
-            ? (summaries.gist || <em>No summary available.</em>)
-            : (summaries.brainy || <em>No summary available.</em>)
+            ? (summaries.gist || <em>No gist summary available.</em>)
+            : (summaries.brainy || <em>No brainy summary available.</em>)
           }
         </div>
-        <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>{brief.date}</div>
+        <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>
+          {brief.date || 'No date available'}
+        </div>
       </div>
     </Card>
   );
 };
-
-// Example usage: Render BriefCard in a parent component by passing a 'brief' prop.
-// <BriefCard brief={someBriefObject} />
