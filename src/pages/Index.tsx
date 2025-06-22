@@ -25,7 +25,7 @@ import {
 import { usePreferences } from '../hooks/usePreferences';
 import SettingsModal from '../components/SettingsModal';
 import NextBriefCountdown from '../components/NextBriefCountdown';
-import { BriefCard } from '../components/BriefCard';
+import BriefCard from '../components/BriefCard';
 
 const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -359,7 +359,7 @@ const Index = () => {
 
             <Stack spacing={3}>
               {briefs.map((brief) => (
-                <BriefCard key={brief.id} brief={brief} />
+                <BriefCard brief={brief} />
               ))}
             </Stack>
           </Box>
