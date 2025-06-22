@@ -37,7 +37,7 @@ const getTopicIcon = (topic: string) => {
   return icons[topic as keyof typeof icons] || '📰';
 }; 
 
-const BriefCard = ({ brief }: BriefCardProps) => {
+export const BriefCard = ({ brief }: BriefCardProps) => {
   const [news, setNews] = useState<{ title: string; description: string; url: string } | null>(null);
 
   const handleClick = async () => {
