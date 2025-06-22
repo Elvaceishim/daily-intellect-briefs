@@ -9,9 +9,5 @@
 
   [plugins.inputs]
     jobs = [
-      { 
-        name = "daily-briefs",
-        cron = "0 8 * * *",
-        command = "curl -X POST https://dbg1.netlify.app/.netlify/functions/send-daily-briefs"
-      }
+      { name = "daily-briefs", cron = "0 8 * * *", command = "curl -X POST https://dbg1.netlify.app/.netlify/functions/send-daily-briefs" }
     ]
