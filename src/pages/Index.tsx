@@ -58,21 +58,21 @@ const Index = () => {
       headlines: 5
     },
     {
-      id: 2,
-      date: '2025-06-14',
-      topics: ['crypto', 'finance'],
-      summary: 'Bitcoin reaches new monthly high, Federal Reserve hints at rate changes, major tech earnings beat expectations.',
-      readTime: '4 min read',
+      title: "Crypto Market Update",
+      summary: "Bitcoin hits new highs as market stabilizes...",
+      date: "2025-06-14",
+      topics: ["crypto", "finance"],
+      readTime: "4 min",
       headlines: 7
     },
     {
-      id: 3,
-      date: '2025-06-13',
-      topics: ['tech', 'finance'],
-      summary: 'Tesla announces new factory locations, fintech startups raise record funding, AI regulation discussions intensify.',
-      readTime: '2 min read',
-      headlines: 4
-    }
+      title: "Climate Change Summit Highlights",
+      summary: "World leaders gather to discuss climate action...",
+      date: "2025-06-13",
+      topics: ["environment", "politics"],
+      readTime: "5 min",
+      headlines: 6
+    },
   ];
 
   const stats = [
