@@ -3,7 +3,7 @@ import { NewsService } from '../../src/services/newsService';
 import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
 
-const handler: Handler = async (event: HandlerEvent) => {
+export const handler = async (event, context) => {
   // Verify this is a scheduled call (security measure)
   if (event.httpMethod !== 'POST') {
     return {
@@ -124,6 +124,12 @@ const handler: Handler = async (event: HandlerEvent) => {
       })
     };
   }
+
+  return {
+    statusCode: 200,
+    body: "Daily brief sent!",
+  };
 };
 
-export { handler };
+// Schedule: every day at 8 AM UTC
+export const schedule = "0 8 * * *";
