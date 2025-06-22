@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 exports.handler = async function(event, context) {
   const query = event.queryStringParameters?.query || '';
   const apiKey = process.env.NEWS_API_KEY;
-  const url = `https://gnews.io/api/v4/top-headlines?country=us&token=1270ce61d0683636a70e7934beaf7843`;
+  const url = `https://api.mediastack.com/v1/news?access_key=5121f0823678cd12355a12dcf26358ba&countries=us&languages=en&limit=10`;
 
   try {
     const response = await fetch(url);
@@ -16,7 +16,7 @@ exports.handler = async function(event, context) {
     console.error('Fetch error:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to fetch news' }),
+      body: JSON.stringify({ error: 'Failed to fetch news', details: err.message }),
     };
   }
 };
