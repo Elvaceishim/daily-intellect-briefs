@@ -27,7 +27,7 @@ const BriefCard: React.FC<BriefCardProps> = ({ brief }) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setNews(data.articles?.[0] || null);
+      setNews(data.data?.[0] || null); // mediastack uses "data" array
     } catch (error) {
       console.error('Fetch error:', error);
     }
