@@ -18,16 +18,13 @@ const BriefCard: React.FC<BriefCardProps> = ({ brief }) => {
   const [news, setNews] = useState<{ title: string; description: string; url: string } | null>(null);
 
   const handleClick = async () => {
-    console.log('Card clicked:', brief.title); // Should never be undefined
     try {
-      const response = await fetch(
-        `/.netlify/functions/news?query=${encodeURIComponent(brief.title)}`
-      );
+      const response = await fetch(`/.netlify/functions/news?query=${encodeURIComponent(brief.title)}`);
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`Network response was not ok: ${response.status}`);
       }
       const data = await response.json();
-      setNews(data.data?.[0] || null); // mediastack uses "data" array
+      setNews(data.data?.[0] || null);
     } catch (error) {
       console.error('Fetch error:', error);
     }
