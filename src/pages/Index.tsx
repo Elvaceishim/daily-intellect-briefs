@@ -36,7 +36,6 @@ const Index = () => {
       date: "2025-06-15",
       topics: ["tech", "ai"],
       readTime: "3 min",
-      headlines: 5
     },
     {
       title: "Crypto Market Update",
@@ -44,7 +43,6 @@ const Index = () => {
       date: "2025-06-14",
       topics: ["crypto", "finance"],
       readTime: "4 min",
-      headlines: 7
     },
     {
       title: "Climate Change Summit Highlights",
@@ -52,7 +50,6 @@ const Index = () => {
       date: "2025-06-13",
       topics: ["environment", "politics"],
       readTime: "5 min",
-      headlines: 6
     },
   ];
 
