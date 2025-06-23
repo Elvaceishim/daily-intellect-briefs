@@ -56,7 +56,10 @@ const Index = () => {
     },
   ];
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const saved = localStorage.getItem('isAuthenticated');
+    return saved ? JSON.parse(saved) : false;
+  });
   const [showSettings, setShowSettings] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [briefs, setBriefs] = useState(mockBriefs); // Start with mockBriefs (3)
@@ -262,8 +265,12 @@ const Index = () => {
     try {
       const response = await fetch('/.netlify/functions/news?limit=10');
       const data = await response.json();
-      console.log('Fetched news:', data); // Add this line
-      setBriefs(Array.isArray(data.data) ? data.data : []);
+      if (Array.isArray(data.data)) {
+        setBriefs(data.data);
+      } else {
+        // Optionally show an error message to the user
+        console.error('No news data returned:', data);
+      }
     } catch (error) {
       console.error('Failed to load more news:', error);
     }

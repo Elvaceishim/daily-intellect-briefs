@@ -1,41 +1,27 @@
 // netlify/functions/news.ts
+const fetch = require('node-fetch');
+
 exports.handler = async function (event, context) {
+  const query = event.queryStringParameters?.query || '';
+  const limit = event.queryStringParameters?.limit || 10;
+  const apiKey = process.env.NEWS_API_KEY || '5121f0823678cd12355a12dcf26358ba';
+
+  let url = `https://api.mediastack.com/v1/news?access_key=${apiKey}&countries=us&languages=en&limit=${limit}`;
+  if (query) {
+    url += `&keywords=${encodeURIComponent(query)}`;
+  }
+
   try {
-    const query = event.queryStringParameters?.query;
-    const limit = event.queryStringParameters?.limit || 7; // Default limit to 7 if not provided
-    if (!query) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Missing query parameter' }),
-      };
-    }
-
-    const apiKey = process.env.NEWS_API_KEY || '5121f0823678cd12355a12dcf26358ba';
-    const url = `https://api.mediastack.com/v1/news?access_key=${apiKey}&countries=us&languages=en&limit=${limit}&keywords=${encodeURIComponent(query)}`;
-
     const response = await fetch(url);
-
-    if (!response.ok) {
-      return {
-        statusCode: response.status,
-        body: JSON.stringify({ error: 'API error', status: response.status }),
-      };
-    }
-
     const data = await response.json();
-
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: JSON.stringify({ data: data.data || [] }),
     };
   } catch (err) {
-    console.error('Fetch error:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: 'Failed to fetch news',
-        details: err.message || 'Unknown error',
-      }),
+      body: JSON.stringify({ error: 'Failed to fetch news', details: err.message }),
     };
   }
 };
