@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -28,25 +28,6 @@ import NextBriefCountdown from '../components/NextBriefCountdown';
 import BriefCard from '../components/BriefCard';
 
 const Index = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  
-  const { preferences, isLoading } = usePreferences();
-
-  const handleSettingsClick = () => {
-    console.log('Settings clicked!');
-    setShowSettings(true);
-    console.log('showSettings set to:', true);
-  };
-
-  const handleCloseSettings = () => {
-    console.log('Closing settings modal');
-    setShowSettings(false);
-  };
-
-  // Add debug log
-  console.log('Current showSettings state:', showSettings);
-
   // Mock data
   const mockBriefs = [
     {
@@ -74,6 +55,39 @@ const Index = () => {
       headlines: 6
     },
   ];
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const [briefs, setBriefs] = useState(mockBriefs); // Start with mockBriefs (3)
+  const [loadingMore, setLoadingMore] = useState(false);
+  
+  const { preferences, isLoading } = usePreferences();
+
+  // Restore authentication state on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('isAuthenticated');
+    if (saved) setIsAuthenticated(JSON.parse(saved));
+  }, []);
+
+  // Save authentication state when it changes
+  useEffect(() => {
+    localStorage.setItem('isAuthenticated', JSON.stringify(isAuthenticated));
+  }, [isAuthenticated]);
+
+  const handleSettingsClick = () => {
+    console.log('Settings clicked!');
+    setShowSettings(true);
+    console.log('showSettings set to:', true);
+  };
+
+  const handleCloseSettings = () => {
+    console.log('Closing settings modal');
+    setShowSettings(false);
+  };
+
+  // Add debug log
+  console.log('Current showSettings state:', showSettings);
 
   const stats = [
     { label: 'Briefs Delivered', value: '47', icon: Mail },
@@ -243,7 +257,17 @@ const Index = () => {
     );
   }
 
-  const briefs = mockBriefs; // or fetched data
+  const handleViewAll = async () => {
+    setLoadingMore(true);
+    try {
+      const response = await fetch('/.netlify/functions/news?limit=10');
+      const data = await response.json();
+      setBriefs(data.data); // mediastack returns articles in data.data
+    } catch (error) {
+      console.error('Failed to load more news:', error);
+    }
+    setLoadingMore(false);
+  };
 
   return (
     <div className="min-h-screen">
@@ -352,8 +376,10 @@ const Index = () => {
                 variant="outlined" 
                 startIcon={<Calendar size={16} />}
                 sx={{ borderRadius: '50px' }}
+                onClick={handleViewAll}
+                disabled={loadingMore}
               >
-                View All
+                {loadingMore ? 'Loading...' : 'View All'}
               </Button>
             </Box>
 
@@ -363,6 +389,18 @@ const Index = () => {
               ))}
             </Stack>
           </Box>
+
+          {showAll && (
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h5">All Briefs</Typography>
+              <Stack spacing={2}>
+                {briefs.map((brief, idx) => (
+                  <BriefCard key={brief.title || idx} brief={brief} />
+                ))}
+              </Stack>
+              <Button onClick={() => setShowAll(false)} sx={{ mt: 2 }}>Close</Button>
+            </Box>
+          )}
         </Container>
       </div>
     </div>
