@@ -89,11 +89,21 @@ const Index = () => {
   // Add debug log
   console.log('Current showSettings state:', showSettings);
 
+  const briefsDelivered = briefs.length;
+  const topicsTracked = preferences.selectedTopics.length;
+  const averageReadTime = (briefs.reduce((sum, b) => sum + (parseFloat(b.readTime) || 0), 0) / briefs.length).toFixed(1) + ' min';
+  const briefsThisWeek = briefs.filter(b => {
+    const date = new Date(b.date);
+    const now = new Date();
+    const diff = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
+    return diff <= 7;
+  }).length + ' briefs';
+
   const stats = [
-    { label: 'Briefs Delivered', value: '47', icon: Mail },
-    { label: 'Topics Tracked', value: isLoading ? '...' : preferences.selectedTopics.length.toString(), icon: TrendingUp },
-    { label: 'Average Read Time', value: '3.2 min', icon: Clock },
-    { label: 'This Week', value: '7 briefs', icon: Calendar }
+    { label: 'Briefs Delivered', value: briefsDelivered, icon: Mail },
+    { label: 'Topics Tracked', value: topicsTracked, icon: TrendingUp },
+    { label: 'Average Read Time', value: averageReadTime, icon: Clock },
+    { label: 'This Week', value: briefsThisWeek, icon: Calendar }
   ];
 
   const features = [

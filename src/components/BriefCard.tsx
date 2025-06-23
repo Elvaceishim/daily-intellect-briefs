@@ -20,12 +20,15 @@ const BriefCard = ({ brief }) => {
           {brief.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          {brief.summary}
+          {brief.description}
         </Typography>
         <Stack direction="row" spacing={1} sx={{ my: 1 }}>
           {brief.topics?.map((topic) => (
             <Chip key={topic} label={topic} color="primary" variant="outlined" size="small" />
           ))}
+          {brief.category && (
+            <Chip label={brief.category} color="primary" variant="outlined" size="small" />
+          )}
         </Stack>
         <Typography variant="caption" color="text.secondary">
           {brief.date} • {brief.readTime} • {brief.headlines} headlines
