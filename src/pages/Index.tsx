@@ -262,7 +262,8 @@ const Index = () => {
     try {
       const response = await fetch('/.netlify/functions/news?limit=10');
       const data = await response.json();
-      setBriefs(data.data); // mediastack returns articles in data.data
+      console.log('Fetched news:', data); // Add this line
+      setBriefs(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
       console.error('Failed to load more news:', error);
     }
@@ -394,7 +395,7 @@ const Index = () => {
             <Box sx={{ mt: 4 }}>
               <Typography variant="h5">All Briefs</Typography>
               <Stack spacing={2}>
-                {briefs.map((brief, idx) => (
+                {Array.isArray(briefs) && briefs.map((brief, idx) => (
                   <BriefCard key={brief.title || idx} brief={brief} />
                 ))}
               </Stack>
