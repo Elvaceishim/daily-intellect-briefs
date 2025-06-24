@@ -2,6 +2,7 @@ import { Handler, HandlerEvent } from '@netlify/functions';
 import { NewsService } from '../../src/services/newsService';
 import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
+import nodemailer from 'nodemailer';
 
 export const handler = async (event, context) => {
   // Verify this is a scheduled call (security measure)
@@ -133,3 +134,30 @@ export const handler = async (event, context) => {
 
 // Schedule: every day at 8 AM UTC
 export const schedule = "0 8 * * *";
+
+exports.handler = async (event) => {
+  const { email, summary } = JSON.parse(event.body);
+
+  // Use your Gmail address and the app password you generated
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'yourgmail@gmail.com',
+      pass: process.env.GMAIL_APP_PASSWORD, // Store this in Netlify env vars!
+    },
+  });
+
+  const mailOptions = {
+    from: 'yourgmail@gmail.com',
+    to: email,
+    subject: 'Your Daily Brief',
+    html: `<p>${summary}</p>`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return { statusCode: 200, body: JSON.stringify({ success: true }) };
+  } catch (err) {
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+  }
+};
