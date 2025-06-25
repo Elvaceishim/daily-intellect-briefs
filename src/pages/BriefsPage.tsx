@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import BriefCard from '../components/BriefCard';
 import { Box, Card, CardContent, Typography, Button, Stack, Paper } from '@mui/material';
 import { Mail, TrendingUp, Clock, Calendar } from 'lucide-react';
 import { getAISummary } from '../utils/getAISummary';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import BriefCard from '../components/BriefCard';
 
 const BriefsPage = () => {
   const [briefs, setBriefs] = useState([]);
@@ -238,63 +238,16 @@ const BriefsPage = () => {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-            gap: { xs: 2, md: 3 },
+            gridTemplateColumns: isMobile
+              ? '1fr'
+              : isTablet
+              ? '1fr 1fr'
+              : '1fr 1fr 1fr 1fr',
+            gap: { xs: 2, sm: 3, md: 4 },
           }}
         >
           {filteredBriefs.map((brief, idx) => (
-            <Paper
-              key={idx}
-              elevation={2}
-              sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', md: 'row' },
-                alignItems: { md: 'flex-start' },
-                p: 2,
-                borderRadius: 3,
-                minHeight: 180,
-                gap: 2,
-                background: '#f8fafc',
-                overflow: 'hidden',
-              }}
-            >
-              <Box
-                sx={{
-                  width: { xs: '100%', md: 120 },
-                  height: 100,
-                  minWidth: 100,
-                  background: '#e0e7ef',
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mb: { xs: 2, md: 0 },
-                }}
-              >
-                <img
-                  src={brief.image || '/placeholder.png'}
-                  alt={brief.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    display: 'block',
-                  }}
-                />
-              </Box>
-              <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#2563eb', mb: 1, fontSize: 18, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {brief.title}
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#374151', mb: 1, maxHeight: 48, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {brief.summary || brief.description}
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#6b7280' }}>
-                  {brief.source?.name} &middot; {new Date(brief.published_at || brief.date).toLocaleDateString()}
-                </Typography>
-              </Box>
-            </Paper>
+            <BriefCard key={idx} brief={brief} />
           ))}
         </Box>
       )}
