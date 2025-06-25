@@ -135,11 +135,16 @@ const BriefsPage = () => {
 
       <Box
         sx={{
-          mt: { xs: 5, md: 8 },
+          mt: { xs: 4, md: 8 },
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
-          gap: 3,
+          gridTemplateColumns: {
+            xs: '1fr',         // Mobile: 1 column
+            sm: '1fr 1fr',     // iPad/tablet: 2 columns
+            md: '1fr 1fr 1fr 1fr', // Desktop: 4 columns
+          },
+          gap: { xs: 2, sm: 3, md: 4 },
           mb: 4,
+          px: { xs: 1, sm: 4, md: 8 }, // Padding for mobile/tablet/desktop
         }}
       >
         {stats.map((stat, index) => (

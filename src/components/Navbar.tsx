@@ -1,13 +1,25 @@
 import { AppBar, Toolbar, Button, Box, Typography } from '@mui/material';
 import { Sparkles, Settings } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SettingsModal from './SettingsModal';
 import NextBriefCountdown from './NextBriefCountdown';
+import { supabase } from '../supabaseClient';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <AppBar position="static" color="transparent" elevation={0} sx={{ backdropFilter: 'blur(12px)' }}>
@@ -40,27 +52,29 @@ const Navbar = () => {
           >
             Settings
           </Button>
-          <Button
-            variant="contained"
-            sx={{
-              borderRadius: 999,
-              background: 'linear-gradient(90deg, #e75480, #a890fe)',
-              color: '#fff',
-              fontWeight: 600,
-              boxShadow: 3,
-              px: 3,
-              py: 1.2,
-              fontSize: '1rem',
-              textTransform: 'none',
-              '&:hover': {
-                background: 'linear-gradient(90deg, #a890fe, #e75480)',
-                boxShadow: 6,
-              },
-            }}
-            onClick={() => navigate('/login')}
-          >
-            Login
-          </Button>
+          {!user && (
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: 999,
+                background: 'linear-gradient(90deg, #e75480, #a890fe)',
+                color: '#fff',
+                fontWeight: 600,
+                boxShadow: 3,
+                px: 3,
+                py: 1.2,
+                fontSize: '1rem',
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'linear-gradient(90deg, #a890fe, #e75480)',
+                  boxShadow: 6,
+                },
+              }}
+              onClick={() => navigate('/login')}
+            >
+              Login
+            </Button>
+          )}
         </Box>
       </Toolbar>
       <SettingsModal open={showSettings} onClose={() => setShowSettings(false)} />

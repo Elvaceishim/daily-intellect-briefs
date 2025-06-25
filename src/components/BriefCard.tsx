@@ -15,11 +15,16 @@ const BriefCard = ({ brief }) => {
         borderLeft: '4px solid #2563eb',
         borderRadius: 4,
         boxShadow: 3,
-        background: 'rgba(255,255,255,0.85)',
+        background: 'rgba(255,255,255,0.95)',
         backdropFilter: 'blur(8px)',
         width: '100%',
-        maxWidth: 400,
+        maxWidth: { xs: '100%', sm: 380, md: 400 },
         mx: 'auto',
+        mb: { xs: 2, sm: 3 },
+        p: { xs: 2, sm: 3 },
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
       }}
     >
       <CardContent>
@@ -27,7 +32,7 @@ const BriefCard = ({ brief }) => {
           <Box
             sx={{
               width: '100%',
-              height: 180,
+              height: { xs: 160, sm: 180, md: 200 },
               overflow: 'hidden',
               borderRadius: 2,
               mb: 2,
