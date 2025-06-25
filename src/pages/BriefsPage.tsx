@@ -13,28 +13,20 @@ const BriefsPage = () => {
   const [selectedTopics, setSelectedTopics] = useState([]);
 
   const isMobile = useMediaQuery('(max-width:600px)');
+  const isTablet = useMediaQuery('(min-width:601px) and (max-width:1023px)');
   const isLaptop = useMediaQuery('(min-width:1024px)');
 
   useEffect(() => {
     const fetchBriefs = async () => {
       try {
-        console.log('Fetching news from: /.netlify/functions/news?limit=10');
         const response = await fetch('/.netlify/functions/news?limit=10');
-        
-        console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
-        
         if (!response.ok) {
           const text = await response.text();
-          console.error('Response error text:', text);
           throw new Error(text);
         }
-        
         const data = await response.json();
         setBriefs(Array.isArray(data.data) ? data.data : []);
       } catch (error) {
-        console.error('Failed to fetch briefs:', error);
-        console.error('Error details:', error.message);
         setBriefs([]);
       }
       setLoading(false);
@@ -48,7 +40,6 @@ const BriefsPage = () => {
     const loadTopics = () => {
       try {
         const userPrefsStored = localStorage.getItem('userPreferences');
-        
         if (userPrefsStored) {
           const userPrefs = JSON.parse(userPrefsStored);
           const topics = userPrefs.selectedTopics || [];
@@ -57,22 +48,18 @@ const BriefsPage = () => {
           setSelectedTopics([]);
         }
       } catch (error) {
-        console.error('Error parsing userPreferences from localStorage:', error);
         setSelectedTopics([]);
       }
     };
 
-    // Load topics initially
     loadTopics();
 
-    // Listen for storage changes from other tabs
     const handleStorageChange = (e) => {
       if (e.key === 'userPreferences') {
         loadTopics();
       }
     };
 
-    // Listen for custom events from same tab/component updates
     const handleUserPrefsUpdate = () => {
       loadTopics();
     };
@@ -85,11 +72,6 @@ const BriefsPage = () => {
       window.removeEventListener('userPreferencesUpdated', handleUserPrefsUpdate);
     };
   }, []);
-
-  // Debug: Log when selectedTopics changes
-  useEffect(() => {
-    console.log('selectedTopics state updated:', selectedTopics);
-  }, [selectedTopics]);
 
   const briefsDelivered = briefs.length;
   const topicsTracked = selectedTopics.length;
@@ -120,93 +102,75 @@ const BriefsPage = () => {
     ? briefs
     : briefs.filter(b => (b.category || 'General') === selectedCategory);
 
-  // Debug function to manually test localStorage
-  const testLocalStorage = () => {
-    // Update the userPreferences object
-    const userPrefs = JSON.parse(localStorage.getItem('userPreferences') || '{}');
-    userPrefs.selectedTopics = ['technology', 'business', 'science'];
-    localStorage.setItem('userPreferences', JSON.stringify(userPrefs));
-    console.log('Test topics saved to userPreferences');
-    
-    // Force re-read
-    setSelectedTopics(userPrefs.selectedTopics);
-    console.log('Topics loaded:', userPrefs.selectedTopics);
-  };
-
   return (
-    <div>
-
-
-      <Box
-        sx={{
-          width: '100vw',
-          minHeight: '100vh',
-          maxWidth: isLaptop ? 1200 : isMobile ? '100vw' : 900,
-          mx: 'auto',
-          px: { xs: 0, sm: 2, md: 4 },
-          py: { xs: 1, sm: 3 },
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : isLaptop ? '1fr 1fr 1fr 1fr' : '1fr 1fr',
-          gap: { xs: 2, sm: 3, md: 4 },
-          boxSizing: 'border-box',
-        }}
-      >
-        <Box
-  sx={{
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: { xs: 2, sm: 3, md: 4 },
-    mb: 4,
-    px: { xs: 1, sm: 2, md: 4 },
-    width: '100%',
-    maxWidth: 1200,
-    mx: 'auto',
-  }}
->
-  {stats.map((stat, idx) => (
-    <Paper
-      key={stat.label}
-      elevation={3}
+    <Box
       sx={{
-        flex: '1 1 180px',
-        minWidth: 160,
-        maxWidth: 240,
-        p: { xs: 2, sm: 3 },
-        borderRadius: 3,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        background: 'linear-gradient(135deg, #f8fafc 60%, #e3e6f3 100%)',
-        boxShadow: '0 2px 12px 0 rgba(167,144,254,0.08)',
+        width: '100vw',
+        minHeight: '100vh',
+        maxWidth: isLaptop ? 1200 : isTablet ? 900 : '100vw',
+        mx: 'auto',
+        px: { xs: 1, sm: 2, md: 4 },
+        py: { xs: 2, sm: 4 },
+        boxSizing: 'border-box',
       }}
     >
-      <Typography
-        variant="h5"
+      {/* Stats Cards */}
+      <Box
         sx={{
-          fontWeight: 700,
-          color: '#e75480',
-          mb: 1,
-          fontSize: { xs: 22, sm: 26 },
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: { xs: 2, sm: 3, md: 4 },
+          mb: 4,
+          width: '100%',
+          maxWidth: 1200,
+          mx: 'auto',
         }}
       >
-        {stat.value}
-      </Typography>
-      <Typography
-        variant="body2"
-        sx={{
-          color: '#444',
-          fontWeight: 500,
-          fontSize: { xs: 15, sm: 16 },
-          textAlign: 'center',
-        }}
-      >
-        {stat.label}
-      </Typography>
-    </Paper>
-  ))}
-</Box>
+        {stats.map((stat, idx) => (
+          <Paper
+            key={stat.label}
+            elevation={3}
+            sx={{
+              flex: '1 1 180px',
+              minWidth: 160,
+              maxWidth: 240,
+              p: { xs: 2, sm: 3 },
+              borderRadius: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              background: 'linear-gradient(135deg, #f8fafc 60%, #e3e6f3 100%)',
+              boxShadow: '0 2px 12px 0 rgba(167,144,254,0.08)',
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                color: '#e75480',
+                mb: 1,
+                fontSize: { xs: 22, sm: 26 },
+              }}
+            >
+              {stat.value}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#444',
+                fontWeight: 500,
+                fontSize: { xs: 15, sm: 16 },
+                textAlign: 'center',
+              }}
+            >
+              {stat.label}
+            </Typography>
+          </Paper>
+        ))}
+      </Box>
 
+      {/* Filter Buttons */}
       <Box sx={{ mb: 2 }}>
         <Typography variant="subtitle1" sx={{ mb: 1 }}>
           Filter by Category
@@ -248,7 +212,7 @@ const BriefsPage = () => {
       {!loading && filteredBriefs.map((brief, idx) => (
         <BriefCard key={idx} brief={brief} />
       ))}
-    </div>
+    </Box>
   );
 };
 
