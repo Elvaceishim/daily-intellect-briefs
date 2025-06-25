@@ -1,13 +1,14 @@
 import { AppBar, Toolbar, Button, Box, Typography } from '@mui/material';
 import { Sparkles, Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import SettingsModal from './SettingsModal';
 import NextBriefCountdown from './NextBriefCountdown';
 import { supabase } from '../supabaseClient';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showSettings, setShowSettings] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -21,6 +22,9 @@ const Navbar = () => {
     };
   }, []);
 
+  // Only show settings/countdown if user is logged in and on /briefs
+  const showBriefsExtras = user && location.pathname.startsWith('/briefs');
+
   return (
     <AppBar position="static" color="transparent" elevation={0} sx={{ backdropFilter: 'blur(12px)' }}>
       <Toolbar sx={{ flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: 2 }}>
@@ -29,7 +33,7 @@ const Navbar = () => {
           <Typography variant="h6" fontWeight={700} color="#e75480">Daily Briefs</Typography>
         </Box>
         <Box display="flex" alignItems="center" gap={2} sx={{ ml: 'auto' }}>
-          {user && (
+          {showBriefsExtras && (
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
               <NextBriefCountdown targetTime="08:00" />
               <Button
