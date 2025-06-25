@@ -30,51 +30,23 @@ const Navbar = () => {
         </Box>
         <Box display="flex" alignItems="center" gap={2} sx={{ ml: 'auto' }}>
           {user && (
-            <>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
               <NextBriefCountdown targetTime="08:00" />
               <Button
                 variant="contained"
                 startIcon={<Settings size={18} />}
-                sx={{
-                  borderRadius: 999,
-                  fontWeight: 600,
-                  background: 'linear-gradient(90deg, #e75480, #a890fe)',
-                  color: '#fff',
-                  boxShadow: 3,
-                  px: 3,
-                  py: 1.2,
-                  fontSize: '1rem',
-                  textTransform: 'none',
-                  '&:hover': {
-                    background: 'linear-gradient(90deg, #a890fe, #e75480)',
-                    boxShadow: 6,
-                  },
-                }}
+                sx={{ borderRadius: 999, fontWeight: 600 }}
                 onClick={() => setShowSettings(true)}
               >
                 Settings
               </Button>
-            </>
+            </Box>
           )}
           {!user && (
             <Button
               variant="contained"
-              sx={{
-                borderRadius: 999,
-                background: 'linear-gradient(90deg, #e75480, #a890fe)',
-                color: '#fff',
-                fontWeight: 600,
-                boxShadow: 3,
-                px: 3,
-                py: 1.2,
-                fontSize: '1rem',
-                textTransform: 'none',
-                '&:hover': {
-                  background: 'linear-gradient(90deg, #a890fe, #e75480)',
-                  boxShadow: 6,
-                },
-              }}
               onClick={() => navigate('/login')}
+              sx={{ borderRadius: 999, fontWeight: 600 }}
             >
               Login
             </Button>

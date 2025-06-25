@@ -39,6 +39,8 @@ const Login = () => {
         width: '100vw',
         boxSizing: 'border-box',
         padding: '0 8px',
+        zIndex: 2,
+        position: 'relative',
       }}
     >
       <form
@@ -54,6 +56,8 @@ const Login = () => {
           flexDirection: 'column',
           gap: 24,
           margin: '0 auto',
+          zIndex: 3,
+          position: 'relative',
         }}
       >
         <h2 style={{ margin: 0, color: '#e75480', textAlign: 'center', fontWeight: 700 }}>

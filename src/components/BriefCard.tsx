@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, Chip, Stack, Button, Box } from '@mui/material';
+import Card from '@mui/material/Card';
+import { CardContent, Typography, Chip, Stack, Button, Box } from '@mui/material';
 
 const BriefCard = ({ brief }) => {
   const [open, setOpen] = useState(false);

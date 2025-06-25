@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import BriefCard from '../components/BriefCard';
-import { Box, Card, CardContent, Typography, Button, Stack } from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, Stack, Paper } from '@mui/material';
 import { Mail, TrendingUp, Clock, Calendar } from 'lucide-react';
 import { getAISummary } from '../utils/getAISummary';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -151,32 +151,61 @@ const BriefsPage = () => {
           boxSizing: 'border-box',
         }}
       >
-        {stats.map((stat, index) => (
-          <Card
-            key={index}
-            sx={{
-              height: '100%',
-              textAlign: 'center',
-              borderRadius: 4,
-              boxShadow: 3,
-              background: 'rgba(255,255,255,0.85)',
-              backdropFilter: 'blur(8px)',
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Box mb={1}>
-                <stat.icon size={32} style={{ color: '#6b7280' }} />
-              </Box>
-              <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>
-                {stat.value}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {stat.label}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
+        <Box
+  sx={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: { xs: 2, sm: 3, md: 4 },
+    mb: 4,
+    px: { xs: 1, sm: 2, md: 4 },
+    width: '100%',
+    maxWidth: 1200,
+    mx: 'auto',
+  }}
+>
+  {stats.map((stat, idx) => (
+    <Paper
+      key={stat.label}
+      elevation={3}
+      sx={{
+        flex: '1 1 180px',
+        minWidth: 160,
+        maxWidth: 240,
+        p: { xs: 2, sm: 3 },
+        borderRadius: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #f8fafc 60%, #e3e6f3 100%)',
+        boxShadow: '0 2px 12px 0 rgba(167,144,254,0.08)',
+      }}
+    >
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: 700,
+          color: '#e75480',
+          mb: 1,
+          fontSize: { xs: 22, sm: 26 },
+        }}
+      >
+        {stat.value}
+      </Typography>
+      <Typography
+        variant="body2"
+        sx={{
+          color: '#444',
+          fontWeight: 500,
+          fontSize: { xs: 15, sm: 16 },
+          textAlign: 'center',
+        }}
+      >
+        {stat.label}
+      </Typography>
+    </Paper>
+  ))}
+</Box>
 
       <Box sx={{ mb: 2 }}>
         <Typography variant="subtitle1" sx={{ mb: 1 }}>
