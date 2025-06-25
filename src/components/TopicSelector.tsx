@@ -334,24 +334,6 @@ const TopicSelector = () => {
                 </Box>
               }
             />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={preferences.whatsappNotifications}
-                  onChange={(e) => updatePreference('whatsappNotifications', e.target.checked)}
-                  color="primary"
-                />
-              }
-              label={
-                <Box>
-                  <Typography variant="body2" fontWeight="bold">WhatsApp Notifications</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Get brief summaries on WhatsApp
-                  </Typography>
-                </Box>
-              }
-            />
           </Box>
         </CardContent>
       </Card>

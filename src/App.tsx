@@ -1,26 +1,41 @@
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { theme } from './theme';
-import Index from './pages/Index';
+import React, { useState, useEffect } from 'react';
+import { CssBaseline, Container } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import FeaturesGrid from './components/FeaturesGrid';
+import Login from './pages/Login';
+import BriefsPage from './pages/BriefsPage';
 
-const queryClient = new QueryClient();
+const App = () => {
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
-function App() {
+  useEffect(() => {
+    const saved = localStorage.getItem('userEmail');
+    if (saved) setUserEmail(saved);
+  }, []);
+
+  const handleLogin = (email: string) => {
+    setUserEmail(email);
+  };
+
   return (
-    <ThemeProvider theme={theme}>
+    <Router>
       <CssBaseline />
-      <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen">
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
-      </QueryClientProvider>
-    </ThemeProvider>
+      <Navbar />
+      <Container maxWidth="lg">
+        <Routes>
+          <Route path="/" element={
+            userEmail
+              ? <BriefsPage userEmail={userEmail} />
+              : <Hero />
+          } />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/briefs" element={<BriefsPage />} />
+        </Routes>
+      </Container>
+    </Router>
   );
-}
+};
 
 export default App;

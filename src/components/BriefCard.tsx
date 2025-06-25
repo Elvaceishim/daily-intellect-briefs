@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, Chip, Stack, Button } from '@mui/material';
+import { Card, CardContent, Typography, Chip, Stack, Button, Box } from '@mui/material';
 
 const BriefCard = ({ brief }) => {
   const [open, setOpen] = useState(false);
@@ -16,6 +16,32 @@ const BriefCard = ({ brief }) => {
       }}
     >
       <CardContent>
+        {brief.image && (
+          <Box
+            sx={{
+              width: '100%',
+              height: 180,
+              overflow: 'hidden',
+              borderRadius: 2,
+              mb: 2,
+              background: '#f3f3f3',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <img
+              src={brief.image}
+              alt={brief.title}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+              }}
+            />
+          </Box>
+        )}
         <Typography variant="h6" gutterBottom>
           {brief.title}
         </Typography>
@@ -23,7 +49,7 @@ const BriefCard = ({ brief }) => {
           {brief.description}
         </Typography>
         <Stack direction="row" spacing={1} sx={{ my: 1 }}>
-          {brief.topics?.map((topic) => (
+          {Array.isArray(brief.topics) && brief.topics.map((topic) => (
             <Chip key={topic} label={topic} color="primary" variant="outlined" size="small" />
           ))}
           {brief.category && (
@@ -31,12 +57,16 @@ const BriefCard = ({ brief }) => {
           )}
         </Stack>
         <Typography variant="caption" color="text.secondary">
-          {brief.date} • {brief.readTime} • {brief.headlines} headlines
+          {brief.date?.split('T')[0]} • {brief.readTime} • {brief.headlines} headline{brief.headlines > 1 ? 's' : ''}
         </Typography>
         {open && (
           <div style={{ marginTop: 16 }}>
             <Typography variant="body2" sx={{ mb: 1 }}>
-              {brief.fullSummary || brief.summary}
+              {
+                brief.aiSummary && brief.aiSummary !== brief.summary
+                  ? brief.aiSummary
+                  : (brief.fullSummary || brief.summary || brief.description)
+              }
             </Typography>
             {brief.url && (
               <Button
