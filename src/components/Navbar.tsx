@@ -28,7 +28,7 @@ const Navbar = () => {
           <Sparkles color="#e75480" size={32} />
           <Typography variant="h6" fontWeight={700} color="#e75480">Daily Briefs</Typography>
         </Box>
-        <Box display="flex" alignItems="center" gap={2}>
+        <Box display="flex" alignItems="center" gap={2} sx={{ ml: 'auto' }}>
           {user && (
             <>
               <NextBriefCountdown targetTime="08:00" />
@@ -37,9 +37,9 @@ const Navbar = () => {
                 startIcon={<Settings size={18} />}
                 sx={{
                   borderRadius: 999,
+                  fontWeight: 600,
                   background: 'linear-gradient(90deg, #e75480, #a890fe)',
                   color: '#fff',
-                  fontWeight: 600,
                   boxShadow: 3,
                   px: 3,
                   py: 1.2,

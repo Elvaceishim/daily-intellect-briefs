@@ -36,19 +36,24 @@ const Login = () => {
         alignItems: 'center',
         justifyContent: 'center',
         background: 'linear-gradient(120deg, #e75480 0%, #a890fe 100%)',
+        width: '100vw',
+        boxSizing: 'border-box',
+        padding: '0 8px',
       }}
     >
       <form
         onSubmit={handleAuth}
         style={{
           background: 'white',
-          padding: '40px 32px',
+          padding: '40px 24px',
           borderRadius: 20,
           boxShadow: '0 8px 32px 0 rgba(31,38,135,0.10)',
-          minWidth: 340,
+          width: '100%',
+          maxWidth: 340,
           display: 'flex',
           flexDirection: 'column',
           gap: 24,
+          margin: '0 auto',
         }}
       >
         <h2 style={{ margin: 0, color: '#e75480', textAlign: 'center', fontWeight: 700 }}>

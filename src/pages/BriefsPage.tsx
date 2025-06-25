@@ -13,6 +13,7 @@ const BriefsPage = () => {
   const [selectedTopics, setSelectedTopics] = useState([]);
 
   const isMobile = useMediaQuery('(max-width:600px)');
+  const isLaptop = useMediaQuery('(min-width:1024px)');
 
   useEffect(() => {
     const fetchBriefs = async () => {
@@ -138,15 +139,16 @@ const BriefsPage = () => {
 
       <Box
         sx={{
-          mt: { xs: 4, sm: 6 },
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', // 1 column on mobile, 2 on tablet/desktop
-          gap: { xs: 2, sm: 3 },
-          mb: 4,
-          px: { xs: 1, sm: 4 },
           width: '100vw',
-          maxWidth: 900,
+          minHeight: '100vh',
+          maxWidth: isLaptop ? 1200 : isMobile ? '100vw' : 900,
           mx: 'auto',
+          px: { xs: 0, sm: 2, md: 4 },
+          py: { xs: 1, sm: 3 },
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : isLaptop ? '1fr 1fr 1fr 1fr' : '1fr 1fr',
+          gap: { xs: 2, sm: 3, md: 4 },
+          boxSizing: 'border-box',
         }}
       >
         {stats.map((stat, index) => (
