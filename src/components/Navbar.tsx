@@ -11,7 +11,7 @@ const Navbar = () => {
 
   return (
     <AppBar position="static" color="transparent" elevation={0} sx={{ backdropFilter: 'blur(12px)' }}>
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
+      <Toolbar sx={{ flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: 2 }}>
         <Box display="flex" alignItems="center" gap={1}>
           <Sparkles color="#e75480" size={32} />
           <Typography variant="h6" fontWeight={700} color="#e75480">Daily Briefs</Typography>

@@ -137,7 +137,7 @@ const BriefsPage = () => {
         sx={{
           mt: { xs: 5, md: 8 },
           display: 'grid',
-          gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
           gap: 3,
           mb: 4,
         }}

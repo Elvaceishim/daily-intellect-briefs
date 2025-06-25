@@ -13,6 +13,13 @@ const BriefCard = ({ brief }) => {
         transition: 'box-shadow 0.2s',
         '&:hover': { boxShadow: 6 },
         borderLeft: '4px solid #2563eb',
+        borderRadius: 4,
+        boxShadow: 3,
+        background: 'rgba(255,255,255,0.85)',
+        backdropFilter: 'blur(8px)',
+        width: '100%',
+        maxWidth: 400,
+        mx: 'auto',
       }}
     >
       <CardContent>
