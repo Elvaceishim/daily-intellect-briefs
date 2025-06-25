@@ -3,6 +3,7 @@ import BriefCard from '../components/BriefCard';
 import { Box, Card, CardContent, Typography, Button, Stack } from '@mui/material';
 import { Mail, TrendingUp, Clock, Calendar } from 'lucide-react';
 import { getAISummary } from '../utils/getAISummary';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const BriefsPage = () => {
   const [briefs, setBriefs] = useState([]);
@@ -10,6 +11,8 @@ const BriefsPage = () => {
   const [selectedTag, setSelectedTag] = useState('All');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedTopics, setSelectedTopics] = useState([]);
+
+  const isMobile = useMediaQuery('(max-width:600px)');
 
   useEffect(() => {
     const fetchBriefs = async () => {
@@ -135,16 +138,15 @@ const BriefsPage = () => {
 
       <Box
         sx={{
-          mt: { xs: 4, md: 8 },
+          mt: { xs: 4, sm: 6 },
           display: 'grid',
-          gridTemplateColumns: {
-            xs: '1fr',         // Mobile: 1 column
-            sm: '1fr 1fr',     // iPad/tablet: 2 columns
-            md: '1fr 1fr 1fr 1fr', // Desktop: 4 columns
-          },
-          gap: { xs: 2, sm: 3, md: 4 },
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', // 1 column on mobile, 2 on tablet/desktop
+          gap: { xs: 2, sm: 3 },
           mb: 4,
-          px: { xs: 1, sm: 4, md: 8 }, // Padding for mobile/tablet/desktop
+          px: { xs: 1, sm: 4 },
+          width: '100vw',
+          maxWidth: 900,
+          mx: 'auto',
         }}
       >
         {stats.map((stat, index) => (
@@ -178,13 +180,29 @@ const BriefsPage = () => {
         <Typography variant="subtitle1" sx={{ mb: 1 }}>
           Filter by Category
         </Typography>
-        <Box display="flex" gap={2} mb={3}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            mb: 3,
+            overflowX: isMobile ? 'auto' : 'visible',
+            px: { xs: 1, sm: 0 },
+            width: '100%',
+            flexWrap: isMobile ? 'nowrap' : 'wrap',
+          }}
+        >
           {categories.map(category => (
             <Button
               key={category}
               variant={selectedCategory === category ? 'contained' : 'outlined'}
               onClick={() => setSelectedCategory(category)}
-              sx={{ borderRadius: 999, textTransform: 'none' }}
+              sx={{
+                borderRadius: 999,
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                minWidth: 100,
+                flexShrink: 0,
+              }}
             >
               {category}
             </Button>

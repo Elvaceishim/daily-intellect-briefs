@@ -9,16 +9,14 @@ const BriefCard = ({ brief }) => {
       onClick={() => setOpen((o) => !o)}
       sx={{
         cursor: 'pointer',
-        mb: 2,
         transition: 'box-shadow 0.2s',
         '&:hover': { boxShadow: 6 },
         borderLeft: '4px solid #2563eb',
         borderRadius: 4,
         boxShadow: 3,
         background: 'rgba(255,255,255,0.95)',
-        backdropFilter: 'blur(8px)',
         width: '100%',
-        maxWidth: { xs: '100%', sm: 380, md: 400 },
+        maxWidth: { xs: '100%', sm: 380 },
         mx: 'auto',
         mb: { xs: 2, sm: 3 },
         p: { xs: 2, sm: 3 },

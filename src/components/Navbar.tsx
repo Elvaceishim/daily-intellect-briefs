@@ -29,29 +29,33 @@ const Navbar = () => {
           <Typography variant="h6" fontWeight={700} color="#e75480">Daily Briefs</Typography>
         </Box>
         <Box display="flex" alignItems="center" gap={2}>
-          <NextBriefCountdown targetTime="08:00" />
-          <Button
-            variant="contained"
-            startIcon={<Settings size={18} />}
-            sx={{
-              borderRadius: 999,
-              background: 'linear-gradient(90deg, #e75480, #a890fe)',
-              color: '#fff',
-              fontWeight: 600,
-              boxShadow: 3,
-              px: 3,
-              py: 1.2,
-              fontSize: '1rem',
-              textTransform: 'none',
-              '&:hover': {
-                background: 'linear-gradient(90deg, #a890fe, #e75480)',
-                boxShadow: 6,
-              },
-            }}
-            onClick={() => setShowSettings(true)}
-          >
-            Settings
-          </Button>
+          {user && (
+            <>
+              <NextBriefCountdown targetTime="08:00" />
+              <Button
+                variant="contained"
+                startIcon={<Settings size={18} />}
+                sx={{
+                  borderRadius: 999,
+                  background: 'linear-gradient(90deg, #e75480, #a890fe)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  boxShadow: 3,
+                  px: 3,
+                  py: 1.2,
+                  fontSize: '1rem',
+                  textTransform: 'none',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #a890fe, #e75480)',
+                    boxShadow: 6,
+                  },
+                }}
+                onClick={() => setShowSettings(true)}
+              >
+                Settings
+              </Button>
+            </>
+          )}
           {!user && (
             <Button
               variant="contained"
