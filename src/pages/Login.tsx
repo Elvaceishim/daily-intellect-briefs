@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -35,86 +37,113 @@ const Login = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(120deg, #e75480 0%, #a890fe 100%)',
-        width: '100vw',
-        boxSizing: 'border-box',
+        background: 'linear-gradient(120deg, #e0e7ff 0%, #2563eb 100%)',
+        fontFamily: 'Inter, Roboto, Arial, sans-serif',
         padding: '0 8px',
-        zIndex: 2,
-        position: 'relative',
       }}
     >
       <form
         onSubmit={handleAuth}
         style={{
-          background: 'white',
-          padding: '40px 24px',
-          borderRadius: 20,
+          background: '#fff',
+          padding: '2.5rem 1.5rem',
+          borderRadius: 18,
           boxShadow: '0 8px 32px 0 rgba(31,38,135,0.10)',
           width: '100%',
           maxWidth: 340,
           display: 'flex',
           flexDirection: 'column',
-          gap: 24,
-          margin: '0 auto',
-          zIndex: 3,
-          position: 'relative',
+          gap: '1.25rem',
         }}
       >
-        <h2 style={{ margin: 0, color: '#e75480', textAlign: 'center', fontWeight: 700 }}>
+        <h2 style={{
+          margin: 0,
+          color: '#2563eb',
+          textAlign: 'center',
+          fontWeight: 700,
+          fontSize: '1.7rem',
+          letterSpacing: '-0.5px'
+        }}>
           {isRegister ? 'Register' : 'Login'}
         </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <label style={{ fontWeight: 500, marginBottom: 6, color: '#444' }}>Email</label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label htmlFor="email" style={{ fontWeight: 500, color: '#374151' }}>Email</label>
           <input
+            id="email"
             type="email"
             placeholder="Enter your email"
             value={email}
             required
             style={{
-              padding: 14,
+              padding: '0.75rem',
               borderRadius: 8,
-              border: '1px solid #ccc',
+              border: error ? '1.5px solid #ef4444' : '1px solid #cbd5e1',
               fontSize: 16,
-              marginBottom: 0,
               outline: 'none',
-              transition: 'border 0.2s',
+              width: '100%',
+              boxSizing: 'border-box',
+              background: '#f8fafc'
             }}
             onChange={e => setEmail(e.target.value)}
           />
+          {error && (
+            <div style={{ color: '#ef4444', fontSize: 14, marginTop: 4 }}>
+              {error}
+            </div>
+          )}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <label style={{ fontWeight: 500, marginBottom: 6, color: '#444' }}>Password</label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label htmlFor="password" style={{ fontWeight: 500, color: '#374151' }}>Password</label>
           <input
+            id="password"
             type="password"
             placeholder="Enter your password"
             value={password}
             required
             style={{
-              padding: 14,
+              padding: '0.75rem',
               borderRadius: 8,
-              border: '1px solid #ccc',
+              border: error ? '1.5px solid #ef4444' : '1px solid #cbd5e1',
               fontSize: 16,
-              marginBottom: 0,
               outline: 'none',
-              transition: 'border 0.2s',
+              width: '100%',
+              boxSizing: 'border-box',
+              background: '#f8fafc'
             }}
             onChange={e => setPassword(e.target.value)}
           />
+          <a
+            href="#"
+            style={{
+              color: '#2563eb',
+              fontSize: 14,
+              marginTop: 2,
+              textAlign: 'right',
+              textDecoration: 'underline',
+              cursor: 'pointer'
+            }}
+            onClick={e => {
+              e.preventDefault();
+              alert('Forgot password functionality coming soon!');
+            }}
+          >
+            Forgot Password?
+          </a>
         </div>
         <button
           type="submit"
           disabled={loading}
           style={{
-            padding: '12px 0',
+            padding: '0.75rem 0',
             borderRadius: 999,
-            background: 'linear-gradient(90deg, #e75480, #a890fe)',
+            background: '#2563eb',
             color: '#fff',
             fontWeight: 700,
             border: 'none',
             fontSize: 18,
             marginTop: 8,
             cursor: loading ? 'not-allowed' : 'pointer',
-            boxShadow: '0 2px 8px 0 rgba(167,144,254,0.10)',
+            boxShadow: '0 2px 8px 0 rgba(37,99,235,0.10)',
             transition: 'background 0.2s',
           }}
         >
@@ -127,7 +156,7 @@ const Login = () => {
             style={{
               background: 'none',
               border: 'none',
-              color: '#a890fe',
+              color: '#6b7280',
               cursor: 'pointer',
               fontWeight: 500,
               fontSize: 15,
@@ -139,11 +168,16 @@ const Login = () => {
           </button>
         </div>
         {error && (
-          <div style={{ color: '#e75480', marginTop: 8, textAlign: 'center', fontWeight: 500 }}>
+          <div style={{ color: '#ef4444', marginTop: 8, textAlign: 'center', fontWeight: 500, fontSize: 15 }}>
             {error}
           </div>
         )}
       </form>
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <CircularProgress color="primary" />
+        </Box>
+      )}
     </div>
   );
 };

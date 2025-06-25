@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import Card from '@mui/material/Card';
-import { CardContent, Typography, Chip, Stack, Button, Box } from '@mui/material';
+import { Card, CardContent, Typography, Button, Box } from '@mui/material';
 
 const BriefCard = ({ brief }) => {
-  const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const handleExpand = () => setExpanded(true);
+  const handleCollapse = () => setExpanded(false);
 
   return (
     <Card
-      onClick={() => setOpen((o) => !o)}
       sx={{
         width: '100%',
         maxWidth: { xs: '100vw', sm: 400, md: 420 },
-        minHeight: 320,
+        minHeight: 220,
         mx: 'auto',
         mb: { xs: 2, sm: 3 },
         p: { xs: 2, sm: 3 },
@@ -22,75 +23,77 @@ const BriefCard = ({ brief }) => {
         flexDirection: 'column',
         gap: 2,
         boxSizing: 'border-box',
+        position: 'relative',
       }}
     >
-      <CardContent>
-        {brief.image && (
-          <Box
-            sx={{
+      {brief.image && (
+        <Box
+          sx={{
+            width: '100%',
+            height: 140,
+            overflow: 'hidden',
+            borderRadius: 2,
+            mb: 1,
+            background: '#f3f3f3',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <img
+            src={brief.image}
+            alt={brief.title}
+            style={{
               width: '100%',
-              height: { xs: 160, sm: 180, md: 200 },
-              overflow: 'hidden',
-              borderRadius: 2,
-              mb: 2,
-              background: '#f3f3f3',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block',
             }}
-          >
-            <img
-              src={brief.image}
-              alt={brief.title}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
-          </Box>
+          />
+        </Box>
+      )}
+      <Typography variant="h6" sx={{ fontWeight: 700, color: '#2563eb', mb: 1 }}>
+        {brief.title}
+      </Typography>
+      <Typography
+        variant="body2"
+        sx={{
+          color: '#374151',
+          mb: 1,
+          maxHeight: expanded ? 'none' : 48,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: expanded ? 'unset' : 2,
+          WebkitBoxOrient: 'vertical',
+          transition: 'max-height 0.2s',
+        }}
+      >
+        {brief.summary || brief.description || 'No summary available.'}
+      </Typography>
+      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 1 }}>
+        {!expanded ? (
+          <Button size="small" onClick={handleExpand} sx={{ color: '#2563eb', fontWeight: 600 }}>
+            Open
+          </Button>
+        ) : (
+          <Button size="small" onClick={handleCollapse} sx={{ color: '#6b7280', fontWeight: 600 }}>
+            Close
+          </Button>
         )}
-        <Typography variant="h6" gutterBottom>
-          {brief.title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          {brief.description}
-        </Typography>
-        <Stack direction="row" spacing={1} sx={{ my: 1 }}>
-          {Array.isArray(brief.topics) && brief.topics.map((topic) => (
-            <Chip key={topic} label={topic} color="primary" variant="outlined" size="small" />
-          ))}
-          {brief.category && (
-            <Chip label={brief.category} color="primary" variant="outlined" size="small" />
-          )}
-        </Stack>
-        <Typography variant="caption" color="text.secondary">
-          {brief.date?.split('T')[0]} • {brief.readTime} • {brief.headlines} headline{brief.headlines > 1 ? 's' : ''}
-        </Typography>
-        {open && (
-          <div style={{ marginTop: 16 }}>
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              {
-                brief.aiSummary && brief.aiSummary !== brief.summary
-                  ? brief.aiSummary
-                  : (brief.fullSummary || brief.summary || brief.description)
-              }
-            </Typography>
-            {brief.url && (
-              <Button
-                size="small"
-                href={brief.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="contained"
-              >
-                Read More
-              </Button>
-            )}
-          </div>
-        )}
-      </CardContent>
+        <Button
+          size="small"
+          href={brief.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ color: '#2563eb', fontWeight: 600, ml: 'auto' }}
+        >
+          Read More
+        </Button>
+      </Box>
+      <Typography variant="caption" sx={{ color: '#6b7280', mt: 1 }}>
+        {brief.source?.name} &middot; {new Date(brief.published_at || brief.date).toLocaleDateString()}
+      </Typography>
     </Card>
   );
 };

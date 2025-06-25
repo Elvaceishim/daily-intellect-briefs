@@ -4,6 +4,8 @@ import { Box, Card, CardContent, Typography, Button, Stack, Paper } from '@mui/m
 import { Mail, TrendingUp, Clock, Calendar } from 'lucide-react';
 import { getAISummary } from '../utils/getAISummary';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 const BriefsPage = () => {
   const [briefs, setBriefs] = useState([]);
@@ -18,14 +20,24 @@ const BriefsPage = () => {
 
   useEffect(() => {
     const fetchBriefs = async () => {
+      setLoading(true);
       try {
         const response = await fetch('/.netlify/functions/news?limit=10');
-        if (!response.ok) {
-          const text = await response.text();
-          throw new Error(text);
-        }
         const data = await response.json();
-        setBriefs(Array.isArray(data.data) ? data.data : []);
+        let briefs = Array.isArray(data.data) ? data.data : [];
+
+        // Summarize each brief if summary is missing
+        briefs = await Promise.all(
+          briefs.map(async (brief) => {
+            if (!brief.summary && brief.content) {
+              const summary = await getAISummary(brief.content);
+              return { ...brief, summary };
+            }
+            return brief;
+          })
+        );
+
+        setBriefs(briefs);
       } catch (error) {
         setBriefs([]);
       }
@@ -117,10 +129,9 @@ const BriefsPage = () => {
       {/* Stats Cards */}
       <Box
         sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: { xs: 2, sm: 3, md: 4 },
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' },
+          gap: { xs: 2, md: 3 },
           mb: 4,
           width: '100%',
           maxWidth: 1200,
@@ -132,25 +143,24 @@ const BriefsPage = () => {
             key={stat.label}
             elevation={3}
             sx={{
-              flex: '1 1 180px',
-              minWidth: 160,
-              maxWidth: 240,
-              p: { xs: 2, sm: 3 },
+              p: { xs: 2, md: 3 },
               borderRadius: 3,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              background: 'linear-gradient(135deg, #f8fafc 60%, #e3e6f3 100%)',
-              boxShadow: '0 2px 12px 0 rgba(167,144,254,0.08)',
+              background: '#fff',
+              boxShadow: '0 2px 12px 0 rgba(37,99,235,0.08)',
+              minHeight: 120,
+              gap: 1,
             }}
           >
+            <Box sx={{ mb: 1, color: '#2563eb' }}>{React.createElement(stat.icon, { size: 28 })}</Box>
             <Typography
               variant="h5"
               sx={{
                 fontWeight: 700,
-                color: '#e75480',
-                mb: 1,
-                fontSize: { xs: 22, sm: 26 },
+                color: '#2563eb',
+                fontSize: { xs: 22, md: 26 },
               }}
             >
               {stat.value}
@@ -158,9 +168,9 @@ const BriefsPage = () => {
             <Typography
               variant="body2"
               sx={{
-                color: '#444',
+                color: '#6b7280',
                 fontWeight: 500,
-                fontSize: { xs: 15, sm: 16 },
+                fontSize: { xs: 14, md: 16 },
                 textAlign: 'center',
               }}
             >
@@ -175,43 +185,119 @@ const BriefsPage = () => {
         <Typography variant="subtitle1" sx={{ mb: 1 }}>
           Filter by Category
         </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2,
-            mb: 3,
-            overflowX: isMobile ? 'auto' : 'visible',
-            px: { xs: 1, sm: 0 },
-            width: '100%',
-            flexWrap: isMobile ? 'nowrap' : 'wrap',
-          }}
-        >
-          {categories.map(category => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? 'contained' : 'outlined'}
-              onClick={() => setSelectedCategory(category)}
-              sx={{
-                borderRadius: 999,
-                textTransform: 'none',
-                whiteSpace: 'nowrap',
-                minWidth: 100,
-                flexShrink: 0,
-              }}
-            >
-              {category}
-            </Button>
-          ))}
-        </Box>
+        {isMobile ? (
+          <Select
+            value={selectedCategory}
+            onChange={e => setSelectedCategory(e.target.value)}
+            size="small"
+            sx={{ mb: 3, width: '100%', maxWidth: 320, background: '#fff' }}
+          >
+            {categories.map(category => (
+              <MenuItem key={category} value={category}>
+                {category}
+              </MenuItem>
+            ))}
+          </Select>
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              mb: 3,
+              width: '100%',
+              flexWrap: 'wrap',
+            }}
+          >
+            {categories.map(category => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? 'contained' : 'outlined'}
+                onClick={() => setSelectedCategory(category)}
+                sx={{
+                  borderRadius: 999,
+                  textTransform: 'none',
+                  fontWeight: selectedCategory === category ? 700 : 500,
+                  color: selectedCategory === category ? '#fff' : '#2563eb',
+                  background: selectedCategory === category ? '#2563eb' : '#fff',
+                  borderColor: '#2563eb',
+                  minWidth: 100,
+                }}
+              >
+                {category}
+              </Button>
+            ))}
+          </Box>
+        )}
       </Box>
 
       <h2>Your Daily Briefs</h2>
       {loading && <div>Loading briefs...</div>}
       {!loading && briefs.length === 0 && <div>No briefs found.</div>}
       {!loading && filteredBriefs.length === 0 && <div>No briefs found.</div>}
-      {!loading && filteredBriefs.map((brief, idx) => (
-        <BriefCard key={idx} brief={brief} />
-      ))}
+      {!loading && (
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: { xs: 2, md: 3 },
+          }}
+        >
+          {filteredBriefs.map((brief, idx) => (
+            <Paper
+              key={idx}
+              elevation={2}
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                alignItems: { md: 'flex-start' },
+                p: 2,
+                borderRadius: 3,
+                minHeight: 180,
+                gap: 2,
+                background: '#f8fafc',
+                overflow: 'hidden',
+              }}
+            >
+              <Box
+                sx={{
+                  width: { xs: '100%', md: 120 },
+                  height: 100,
+                  minWidth: 100,
+                  background: '#e0e7ef',
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mb: { xs: 2, md: 0 },
+                }}
+              >
+                <img
+                  src={brief.image || '/placeholder.png'}
+                  alt={brief.title}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#2563eb', mb: 1, fontSize: 18, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {brief.title}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#374151', mb: 1, maxHeight: 48, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {brief.summary || brief.description}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#6b7280' }}>
+                  {brief.source?.name} &middot; {new Date(brief.published_at || brief.date).toLocaleDateString()}
+                </Typography>
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };
