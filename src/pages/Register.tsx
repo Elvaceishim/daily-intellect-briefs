@@ -16,14 +16,40 @@ const Register = () => {
     setLoading(true);
     setError('');
     setMessage('');
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      setError(error.message);
-    } else {
-      setMessage('Registration successful! Please check your email to confirm your account.');
-      setTimeout(() => navigate('/login'), 2500);
+
+    // 1. Sign up with Supabase Auth
+    const { data, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+      return;
     }
+    const user = data?.user;
+
+    // 2. Insert into custom users table
+    const { error: dbError } = await supabase.from('users').insert([
+      {
+        email,
+        name: '', // or collect from form
+        preferences: {
+          selectedTopics: ['technology'],
+          preferredTime: '08:00',
+          emailEnabled: true,
+        },
+      },
+    ]);
+    if (dbError) {
+      setError('Database error creating new user');
+      setLoading(false);
+      return;
+    }
+
+    setMessage('Registration successful! Please check your email to confirm your account.');
     setLoading(false);
+    setTimeout(() => navigate('/login'), 2500);
   };
 
   return (
