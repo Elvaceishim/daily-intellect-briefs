@@ -3,8 +3,6 @@ import { NewsService } from '../../src/services/newsService';
 import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
 import { createClient } from '@supabase/supabase-js';
-import fetch from 'node-fetch';
-import resend from 'resend';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -59,14 +57,7 @@ export const handler = async (event, context) => {
       try {
         // Fetch news for this topic group
         let newsItems = await newsService.fetchNews(topics, 8);
-        
-        // Generate AI summaries if available
         newsItems = await newsService.generateAISummary(newsItems);
-
-        if (newsItems.length === 0) {
-          console.warn(`⚠️ No news found for topics: ${topics.join(', ')}`);
-          continue;
-        }
 
         console.log(`✅ Found ${newsItems.length} news items for ${groupUsers.length} users`);
 
@@ -129,33 +120,7 @@ export const handler = async (event, context) => {
       })
     };
   }
-
-  return {
-    statusCode: 200,
-    body: "Daily brief sent!",
-  };
 };
 
 // Schedule: every day at 8 AM UTC
 export const schedule = "0 8 * * *";
-
-// Email sending function
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER, // your Gmail address
-    pass: process.env.GMAIL_APP_PASSWORD, // your app password
-  },
-});
-
-exports.handler = async function(event, context) {
-  await transporter.sendMail({
-    from: process.env.GMAIL_USER,
-    to: 'recipient@example.com',
-    subject: 'Test Email',
-    text: 'This is a test email from Daily Briefs!',
-  });
-  return { statusCode: 200, body: 'Email sent' };
-};

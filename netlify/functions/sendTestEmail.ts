@@ -2,6 +2,8 @@ import { Handler, HandlerEvent } from '@netlify/functions';
 import { EmailService } from '../../src/services/emailService';
 
 const handler: Handler = async (event: HandlerEvent) => {
+  console.log('Function triggered');
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -21,6 +23,8 @@ const handler: Handler = async (event: HandlerEvent) => {
 
     const emailService = new EmailService();
     const success = await emailService.sendTestEmail(email);
+
+    console.log('Email send attempted');
 
     return {
       statusCode: 200,
