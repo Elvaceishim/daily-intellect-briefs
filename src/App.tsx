@@ -7,6 +7,7 @@ import FeaturesGrid from './components/FeaturesGrid';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import BriefsPage from './pages/BriefsPage';
+import TestEmail from './pages/TestEmail';
 
 const App = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -34,6 +35,7 @@ const App = () => {
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/register" element={<Register />} />
           <Route path="/briefs" element={<BriefsPage />} />
+          <Route path="/test-email" element={<TestEmail />} />
         </Routes>
       </Container>
     </Router>
