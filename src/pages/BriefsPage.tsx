@@ -230,7 +230,7 @@ const BriefsPage = () => {
         )}
       </Box>
 
-      <h2>Your Daily Briefs</h2>
+      <h3>Your Daily Briefs</h3>
       {loading && <div>Loading briefs...</div>}
       {!loading && briefs.length === 0 && <div>No briefs found.</div>}
       {!loading && filteredBriefs.length === 0 && <div>No briefs found.</div>}

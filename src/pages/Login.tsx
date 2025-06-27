@@ -51,7 +51,35 @@ const Login = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        background: 'linear-gradient(120deg, #e0e7ff 0%, #2563eb 100%)',
+        fontFamily: 'Inter, Roboto, Arial, sans-serif',
+        padding: '0 8px',
+        position: 'relative',
+      }}
+    >
+      <h3
+        style={{
+          margin: 0,
+          color: '#2563eb',
+          fontWeight: 700,
+          fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+          letterSpacing: '-0.5px',
+          marginTop: '8rem', // pushes heading downward from the very top
+          marginBottom: '7rem', // space between heading and login box
+          textAlign: 'center',
+          width: '100%',
+          lineHeight: 1.1,
+        }}
+      >
+        Your Daily Briefs
+      </h3>
       <form
         onSubmit={otpSent ? handleVerifyOtp : handleLogin}
         style={{

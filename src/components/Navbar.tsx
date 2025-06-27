@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Button, Box, Typography } from '@mui/material';
+import { AppBar, Toolbar, Button, Box } from '@mui/material';
 import { Sparkles, Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -30,7 +30,7 @@ const Navbar = () => {
       <Toolbar sx={{ flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: 2 }}>
         <Box display="flex" alignItems="center" gap={1}>
           <Sparkles color="#e75480" size={32} />
-          <Typography variant="h6" fontWeight={700} color="#e75480">Daily Briefs</Typography>
+          {/* Removed the "Daily Briefs" Typography */}
         </Box>
         <Box display="flex" alignItems="center" gap={2} sx={{ ml: 'auto' }}>
           {showBriefsExtras && (
