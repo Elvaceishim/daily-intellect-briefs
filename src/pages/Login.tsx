@@ -7,6 +7,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -48,6 +49,22 @@ const Login = () => {
       navigate('/briefs');
     }
     setLoading(false);
+  };
+
+  const handleForgotPassword = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setError('Please enter your email above first.');
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) {
+      setError(error.message);
+      setMessage('');
+    } else {
+      setMessage('Password reset email sent! Check your inbox.');
+      setError('');
+    }
   };
 
   return (
@@ -162,14 +179,63 @@ const Login = () => {
             </button>
           </>
         )}
+        {message && (
+          <div style={{ color: '#2563eb', marginTop: 8, textAlign: 'center', fontWeight: 500, fontSize: 15 }}>
+            {message}
+          </div>
+        )}
         {error && (
           <div style={{ color: '#ef4444', marginTop: 8, textAlign: 'center', fontWeight: 500, fontSize: 15 }}>
             {error}
           </div>
         )}
       </form>
+      <div
+        style={{
+          marginTop: '2rem',
+          color: '#2563eb',
+          fontWeight: 500,
+          fontSize: 15,
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        <a
+          href="#"
+          style={{
+            color: '#2563eb',
+            fontSize: 14,
+            marginTop: 2,
+            textAlign: 'right',
+            textDecoration: 'underline',
+            cursor: 'pointer'
+          }}
+          onClick={handleForgotPassword}
+        >
+          Forgot Password?
+        </a>
+      </div>
+      <div style={{ marginTop: 16, textAlign: 'center' }}>
+        <button
+          type="button"
+          onClick={() => navigate('/register')}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#2563eb',
+            cursor: 'pointer',
+            fontWeight: 500,
+            fontSize: 15,
+            textDecoration: 'underline',
+            padding: 0,
+          }}
+        >
+          Don't have an account? Register
+        </button>
+      </div>
     </div>
   );
 };
+
 
 export default Login;

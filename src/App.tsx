@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import FeaturesGrid from './components/FeaturesGrid';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import BriefsPage from './pages/BriefsPage';
 
 const App = () => {
@@ -31,6 +32,7 @@ const App = () => {
               : <Hero />
           } />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/briefs" element={<BriefsPage />} />
         </Routes>
       </Container>
