@@ -6,6 +6,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import BriefCard from '../components/BriefCard';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const BriefsPage = () => {
   const [briefs, setBriefs] = useState([]);
@@ -17,6 +19,7 @@ const BriefsPage = () => {
   const isMobile = useMediaQuery('(max-width:600px)');
   const isTablet = useMediaQuery('(min-width:601px) and (max-width:1023px)');
   const isLaptop = useMediaQuery('(min-width:1024px)');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBriefs = async () => {
@@ -84,6 +87,11 @@ const BriefsPage = () => {
       window.removeEventListener('userPreferencesUpdated', handleUserPrefsUpdate);
     };
   }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
 
   const briefsDelivered = briefs.length;
   const topicsTracked = selectedTopics.length;
@@ -228,6 +236,25 @@ const BriefsPage = () => {
             ))}
           </Box>
         )}
+      </Box>
+
+      {/* Logout Button */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <button
+          onClick={handleLogout}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#2563eb',
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: 'pointer',
+            textDecoration: 'underline',
+            padding: 0,
+          }}
+        >
+          Log Out
+        </button>
       </Box>
 
       <h3>Your Daily Briefs</h3>
