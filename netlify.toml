@@ -5,5 +5,8 @@
 [dev]
   command = "vite"
   port = 8888
-  targetPort = 8081
+  targetPort = 8080
   framework = "#custom"
+
+[functions."sendDailyBriefs"]
+  schedule = "0 8 * * *" # every day at 8am UTC

@@ -46,7 +46,7 @@ const Navbar = () => {
               </Button>
             </Box>
           )}
-          {!user && (
+          {!user && location.pathname !== '/login' && (
             <Button
               variant="contained"
               onClick={() => navigate('/login')}

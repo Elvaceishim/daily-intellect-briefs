@@ -3,6 +3,11 @@ import { NewsService } from '../../src/services/newsService';
 import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
 import nodemailer from 'nodemailer';
+import { createClient } from '@supabase/supabase-js';
+import fetch from 'node-fetch';
+import resend from 'resend';
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export const handler = async (event, context) => {
   // Verify this is a scheduled call (security measure)
