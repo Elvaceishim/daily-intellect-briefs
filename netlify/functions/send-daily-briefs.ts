@@ -2,7 +2,6 @@ import { Handler, HandlerEvent } from '@netlify/functions';
 import { NewsService } from '../../src/services/newsService';
 import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
-import nodemailer from 'nodemailer';
 import { createClient } from '@supabase/supabase-js';
 import fetch from 'node-fetch';
 import resend from 'resend';
@@ -140,29 +139,23 @@ export const handler = async (event, context) => {
 // Schedule: every day at 8 AM UTC
 export const schedule = "0 8 * * *";
 
-exports.handler = async (event) => {
-  const { email, summary } = JSON.parse(event.body);
+// Email sending function
+const nodemailer = require('nodemailer');
 
-  // Use your Gmail address and the app password you generated
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'yourgmail@gmail.com',
-      pass: process.env.GMAIL_APP_PASSWORD, // Store this in Netlify env vars!
-    },
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER, // your Gmail address
+    pass: process.env.GMAIL_APP_PASSWORD, // your app password
+  },
+});
+
+exports.handler = async function(event, context) {
+  await transporter.sendMail({
+    from: process.env.GMAIL_USER,
+    to: 'recipient@example.com',
+    subject: 'Test Email',
+    text: 'This is a test email from Daily Briefs!',
   });
-
-  const mailOptions = {
-    from: 'yourgmail@gmail.com',
-    to: email,
-    subject: 'Your Daily Brief',
-    html: `<p>${summary}</p>`,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    return { statusCode: 200, body: JSON.stringify({ success: true }) };
-  } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
-  }
+  return { statusCode: 200, body: 'Email sent' };
 };
