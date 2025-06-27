@@ -50,7 +50,7 @@ export class EmailService {
           ${newsItems.map(item => `
             <li>
               <b>${item.title}</b><br/>
-              ${item.summary || ''}<br/>
+              ${item.summary || item.description || ''}<br/>
               <a href="${item.url}">Read more</a>
             </li>
           `).join('')}

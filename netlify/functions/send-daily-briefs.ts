@@ -60,10 +60,12 @@ export const handler = async (event, context) => {
         newsItems = await newsService.generateAISummary(newsItems);
 
         console.log(`✅ Found ${newsItems.length} news items for ${groupUsers.length} users`);
+        console.log('Fetched newsItems:', newsItems);
 
         // Send emails to all users in this group
         for (const user of groupUsers) {
           try {
+            console.log('newsItems to email:', newsItems); // <--- Add here
             const success = await emailService.sendDailyBrief(user, newsItems);
             
             if (success) {

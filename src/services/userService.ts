@@ -1,3 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 interface User {
   email: string;
   name?: string;
@@ -11,46 +18,62 @@ interface User {
 }
 
 export class UserService {
-  // In production, this would connect to your database
-  // For now, we'll use a simple JSON store approach
-  
   async getAllUsers(): Promise<User[]> {
-    // This is a placeholder - in production you'd query your database
-    // For testing, you can return some mock users
-    return [
-      {
-        email: "test@example.com",
-        name: "Test User",
-        preferences: {
-          selectedTopics: ["technology", "business"],
-          preferredTime: "08:00",
-          emailEnabled: true
-        },
-        createdAt: new Date().toISOString()
-      }
-    ];
+    const { data, error } = await supabase
+      .from('users')
+      .select('*');
+    if (error) {
+      console.error('Error fetching users:', error);
+      return [];
+    }
+    return data as User[];
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
-    const users = await this.getAllUsers();
-    return users.find(user => user.email === email) || null;
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+    if (error) {
+      console.error('Error fetching user:', error);
+      return null;
+    }
+    return data as User;
   }
 
   async updateUserPreferences(email: string, preferences: Partial<User['preferences']>): Promise<boolean> {
-    // In production, update the database
-    console.log(`Updating preferences for ${email}:`, preferences);
+    const { error } = await supabase
+      .from('users')
+      .update({ preferences })
+      .eq('email', email);
+    if (error) {
+      console.error('Error updating preferences:', error);
+      return false;
+    }
     return true;
   }
 
   async addUser(user: Omit<User, 'createdAt'>): Promise<boolean> {
-    // In production, add to database
-    console.log(`Adding new user:`, user);
+    const { error } = await supabase
+      .from('users')
+      .insert([{ ...user, createdAt: new Date().toISOString() }]);
+    if (error) {
+      console.error('Error adding user:', error);
+      return false;
+    }
     return true;
   }
 
   async updateLastEmailSent(email: string): Promise<boolean> {
-    // In production, update the database
-    console.log(`Updated last email sent for ${email}:`, new Date().toISOString());
+    const { error } = await supabase
+      .from('users')
+      .update({ lastEmailSent: new Date().toISOString() })
+      .eq('email', email);
+    if (error) {
+      console.error('Error updating lastEmailSent:', error);
+      return false;
+    }
     return true;
   }
 }
