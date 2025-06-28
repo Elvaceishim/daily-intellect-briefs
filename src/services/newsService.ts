@@ -16,13 +16,20 @@ export class NewsService {
 
     for (const category of categories) {
       try {
-        const response = await fetch(
-          `https://newsapi.org/v2/top-headlines?category=${category}&country=us&pageSize=${Math.ceil(limit / categories.length)}&apiKey=${this.NEWS_API_KEY}`
-        );
+        const apiUrl = `https://newsapi.org/v2/top-headlines?category=${category}&country=us&pageSize=${Math.ceil(limit / categories.length)}&apiKey=${this.NEWS_API_KEY}`;
+        console.log('Fetching:', apiUrl); // <-- Log the full API URL
+
+        const response = await fetch(apiUrl);
+        console.log('Response status:', response.status); // <-- Log the HTTP status
+
         if (!response.ok) continue;
 
         const data = await response.json();
-        console.log('Raw news API response:', data); // <-- Log the raw API response
+        console.log('Raw news API response:', data); // <-- Already present
+
+        if (data.status && data.status !== 'ok') {
+          console.error('News API error:', data); // <-- Log API errors
+        }
 
         const categoryNews = data.articles?.map((article: any) => ({
           title: article.title,
