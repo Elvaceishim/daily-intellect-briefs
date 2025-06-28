@@ -8,7 +8,7 @@ interface NewsItem {
 }
 
 export class NewsService {
-  private readonly NEWS_API_KEY = process.env.GNEWS_API_KEY;
+  private readonly GNEWS_API_KEY = process.env.GNEWS_API_KEY;
   private readonly OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
   async fetchNews(categories: string[], limit: number = 10): Promise<NewsItem[]> {
@@ -16,7 +16,7 @@ export class NewsService {
 
     for (const category of categories) {
       try {
-        const apiUrl = `https://newsapi.org/v2/top-headlines?category=${category}&country=us&pageSize=${Math.ceil(limit / categories.length)}&apiKey=${this.NEWS_API_KEY}`;
+        const apiUrl = `https://newsapi.org/v2/top-headlines?category=${category}&country=us&pageSize=${Math.ceil(limit / categories.length)}&apiKey=${this.GNEWS_API_KEY}`;
         console.log('Fetching:', apiUrl); // <-- Log the full API URL
 
         const response = await fetch(apiUrl);
