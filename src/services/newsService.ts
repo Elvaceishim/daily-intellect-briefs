@@ -8,7 +8,7 @@ interface NewsItem {
 }
 
 export class NewsService {
-  private readonly NEWS_API_KEY = process.env.NEWS_API_KEY;
+  private readonly NEWS_API_KEY = process.env.GNEWS_API_KEY;
   private readonly OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
   async fetchNews(categories: string[], limit: number = 10): Promise<NewsItem[]> {
