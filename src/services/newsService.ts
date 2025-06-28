@@ -5,6 +5,7 @@ interface NewsItem {
   source: string;
   category: string;
   publishedAt: string;
+  image?: string; // <-- add this if not present
 }
 
 export class NewsService {
@@ -37,7 +38,8 @@ export class NewsService {
           url: article.url,
           source: article.source.name,
           category: category,
-          publishedAt: article.publishedAt
+          publishedAt: article.publishedAt,
+          image: article.image // <-- Add image mapping here
         })) || [];
 
         allNews.push(...categoryNews);

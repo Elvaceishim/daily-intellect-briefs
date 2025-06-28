@@ -20,6 +20,7 @@ interface NewsItem {
   source: string;
   category: string;
   publishedAt: string;
+  image?: string;
 }
 
 export class EmailService {
@@ -45,12 +46,13 @@ export class EmailService {
   async sendDailyBrief(user: User, newsItems: NewsItem[]): Promise<boolean> {
     try {
       const html = `
-        <h2>Your Daily Briefs</h2>
+        <h2>Hey!, Here Are Your Daily Briefs :)</h2>
         <ul>
           ${newsItems.map(item => `
-            <li>
+            <li style="margin-bottom:24px;">
+              ${item.image ? `<img src="${item.image}" alt="${item.title}" style="max-width:300px;display:block;margin-bottom:8px;" />` : ''}
               <b>${item.title}</b><br/>
-              ${item.summary || item.description || ''}<br/>
+              ${item.summary || ''}<br/>
               <a href="${item.url}">Read more</a>
             </li>
           `).join('')}
@@ -82,6 +84,28 @@ export class EmailService {
       return true;
     } catch (error) {
       console.error('Error sending test email:', error);
+      return false;
+    }
+  }
+
+  async fetchAndSendCategoryNews(user: User, category: string): Promise<boolean> {
+    try {
+      const response = await fetch(`https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${process.env.NEWS_API_KEY}`);
+      const data = await response.json();
+
+      const categoryNews = data.articles?.map((article: any) => ({
+        title: article.title,
+        summary: article.description || (article.content ? article.content.substring(0, 200) + '...' : ''),
+        url: article.url,
+        source: article.source.name,
+        category: category,
+        publishedAt: article.publishedAt,
+        image: article.image // or article.image_url or article.urlToImage depending on API
+      })) || [];
+
+      return this.sendDailyBrief(user, categoryNews);
+    } catch (error) {
+      console.error('Error fetching or sending category news:', error);
       return false;
     }
   }
