@@ -16,7 +16,7 @@ export class NewsService {
 
     for (const category of categories) {
       try {
-        const apiUrl = `https://newsapi.org/v2/top-headlines?category=${category}&country=us&pageSize=${Math.ceil(limit / categories.length)}&apiKey=${this.GNEWS_API_KEY}`;
+        const apiUrl = `https://gnews.io/api/v4/top-headlines?topic=${category}&lang=en&country=us&max=${Math.ceil(limit / categories.length)}&apikey=${this.GNEWS_API_KEY}`;
         console.log('Fetching:', apiUrl); // <-- Log the full API URL
 
         const response = await fetch(apiUrl);
