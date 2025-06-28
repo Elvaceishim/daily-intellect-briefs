@@ -41,17 +41,6 @@ export class NewsService {
 
     console.log('All news before sort/limit:', allNews); // <-- ADD HERE
 
-    if (allNews.length === 0) {
-      allNews.push({
-        title: "Test News",
-        summary: "This is a test news item.",
-        url: "https://example.com",
-        source: "Test Source",
-        category: "test",
-        publishedAt: new Date().toISOString()
-      });
-    }
-
     // Sort by published date and limit
     return allNews
       .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
