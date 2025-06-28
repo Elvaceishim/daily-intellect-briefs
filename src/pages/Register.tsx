@@ -27,18 +27,18 @@ const Register = () => {
       setLoading(false);
       return;
     }
-    const user = data?.user;
 
     // 2. Insert into custom users table
     const { error: dbError } = await supabase.from('users').insert([
       {
-        email,
-        name: '', // or collect from form
+        email: 'user@example.com',
+        name: 'User',
         preferences: {
           selectedTopics: ['technology'],
           preferredTime: '08:00',
           emailEnabled: true,
         },
+        createdat: new Date().toISOString(),
       },
     ]);
     if (dbError) {

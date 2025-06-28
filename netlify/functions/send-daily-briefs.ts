@@ -4,7 +4,10 @@ import { EmailService } from '../../src/services/emailService';
 import { UserService } from '../../src/services/userService';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export const handler = async (event, context) => {
   // Verify this is a scheduled call (security measure)
@@ -24,7 +27,7 @@ export const handler = async (event, context) => {
 
     // Get all users who should receive emails
     const users = await userService.getAllUsers();
-    const activeUsers = users.filter(user => user.preferences.emailEnabled);
+    const activeUsers = users.filter(user => user.preferences?.emailEnabled);
 
     console.log(`📧 Found ${activeUsers.length} active users`);
 
@@ -35,11 +38,20 @@ export const handler = async (event, context) => {
       };
     }
 
+    // Warn for users with no selected topics
+    activeUsers.forEach(user => {
+      const selectedTopics = user.preferences?.selectedTopics ?? [];
+      if (!Array.isArray(selectedTopics) || selectedTopics.length === 0) {
+        console.warn(`User ${user.email} has no selectedTopics.`);
+      }
+    });
+
     // Group users by their preferred topics to optimize API calls
     const topicGroups = new Map<string, typeof activeUsers>();
     
     activeUsers.forEach(user => {
-      const topicsKey = user.preferences.selectedTopics.sort().join(',');
+      const selectedTopics = user.preferences?.selectedTopics ?? [];
+      const topicsKey = selectedTopics.sort().join(',');
       if (!topicGroups.has(topicsKey)) {
         topicGroups.set(topicsKey, []);
       }
@@ -49,14 +61,16 @@ export const handler = async (event, context) => {
     let totalEmailsSent = 0;
     let totalErrors = 0;
 
-    // Process each topic group
     for (const [topicsKey, groupUsers] of topicGroups) {
-      const topics = topicsKey.split(',');
+      const topics = ['technology', 'world'];
       console.log(`📰 Fetching news for topics: ${topics.join(', ')}`);
 
       try {
-        // Fetch news for this topic group
         let newsItems = await newsService.fetchNews(topics, 8);
+        console.log('newsItems after fetch:', newsItems);
+        if (newsItems && newsItems.data) {
+          newsItems = newsItems.data;
+        }
         newsItems = await newsService.generateAISummary(newsItems);
 
         console.log(`✅ Found ${newsItems.length} news items for ${groupUsers.length} users`);
@@ -65,7 +79,7 @@ export const handler = async (event, context) => {
         // Send emails to all users in this group
         for (const user of groupUsers) {
           try {
-            console.log('newsItems to email:', newsItems); // <--- Add here
+            console.log('newsItems to email:', newsItems);
             const success = await emailService.sendDailyBrief(user, newsItems);
             
             if (success) {

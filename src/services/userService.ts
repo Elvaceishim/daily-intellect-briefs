@@ -13,7 +13,7 @@ interface User {
     preferredTime: string;
     emailEnabled: boolean;
   };
-  createdAt: string;
+  createdat: string;
   lastEmailSent?: string;
 }
 
@@ -54,10 +54,10 @@ export class UserService {
     return true;
   }
 
-  async addUser(user: Omit<User, 'createdAt'>): Promise<boolean> {
+  async addUser(user: Omit<User, 'createdat'>): Promise<boolean> {
     const { error } = await supabase
       .from('users')
-      .insert([{ ...user, createdAt: new Date().toISOString() }]);
+      .insert([{ ...user, createdat: new Date().toISOString() }]);
     if (error) {
       console.error('Error adding user:', error);
       return false;

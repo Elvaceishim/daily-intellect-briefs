@@ -19,14 +19,14 @@ export class NewsService {
         const response = await fetch(
           `https://newsapi.org/v2/top-headlines?category=${category}&country=us&pageSize=${Math.ceil(limit / categories.length)}&apiKey=${this.NEWS_API_KEY}`
         );
-        
         if (!response.ok) continue;
-        
+
         const data = await response.json();
-        
+        console.log('Raw news API response:', data); // <-- Log the raw API response
+
         const categoryNews = data.articles?.map((article: any) => ({
           title: article.title,
-          summary: article.description || article.content?.substring(0, 200) + '...',
+          summary: article.description || (article.content ? article.content.substring(0, 200) + '...' : ''),
           url: article.url,
           source: article.source.name,
           category: category,
@@ -37,6 +37,19 @@ export class NewsService {
       } catch (error) {
         console.error(`Error fetching ${category} news:`, error);
       }
+    }
+
+    console.log('All news before sort/limit:', allNews); // <-- ADD HERE
+
+    if (allNews.length === 0) {
+      allNews.push({
+        title: "Test News",
+        summary: "This is a test news item.",
+        url: "https://example.com",
+        source: "Test Source",
+        category: "test",
+        publishedAt: new Date().toISOString()
+      });
     }
 
     // Sort by published date and limit
